@@ -1,14 +1,9 @@
 import db from '../database/database.js';
 import { awardXP, updateStreak, checkBadges, checkGroupUnlock } from './gamification.js';
 import { exec } from 'child_process';
-import { writeFile, unlink, mkdir } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import os from 'os';
 import pathModule from 'path';
-
-
-const toBase64 = (str) => Buffer.from(str).toString('base64');
-const fromBase64 = (str) => Buffer.from(str, 'base64').toString('utf8');
-
 
 export const runCode = async (code, challengeId) => {
   const testCases = db.prepare(`
@@ -64,46 +59,20 @@ export const submitCode = async (userId, challengeId, code) => {
 const executeAgainstCases = async (code, testCases) => {
   const results = [];
   const tmpDir = pathModule.join(os.tmpdir(), `gcp_${Date.now()}`);
-  
+
   try {
     await mkdir(tmpDir, { recursive: true });
-    const javaFile = pathModule.join(tmpDir, 'Main.java');
-    await writeFile(javaFile, code);
+    const pyFile = pathModule.join(tmpDir, 'solution.py');
+    await writeFile(pyFile, code);
 
-    // Compile
-    const compileError = await new Promise((resolve) => {
-      exec(`javac "${javaFile}"`, (error, stdout, stderr) => {
-        resolve(stderr || null);
-      });
-    });
-
-    if (compileError) {
-      for (const tc of testCases) {
-        results.push({
-          passed: false,
-          expected: tc.expected_output,
-          actual: compileError.trim(),
-          status: 'Compilation Error',
-        });
-      }
-      return results;
-    }
-
-    // Run against each test case
     for (const tc of testCases) {
       const output = await new Promise((resolve) => {
-        const process = exec(`java -cp "${tmpDir}" Main`, (error, stdout, stderr) => {
+        const proc = exec(`python "${pyFile}"`, { timeout: 5000 }, (error, stdout, stderr) => {
           resolve({ stdout: stdout || '', stderr: stderr || '', error });
         });
-        if (tc.input) {
-          process.stdin.write(tc.input);
-        }
-        process.stdin.end();
+        if (tc.input) proc.stdin.write(tc.input);
+        proc.stdin.end();
       });
-
-      // const actualOutput = output.stdout.trim();
-      // const expectedOutput = tc.expected_output.trim();
-      // const passed = actualOutput === expectedOutput;
 
       const actualOutput = output.stdout.trim().replace(/\r\n/g, '\n').replace(/\r/g, '\n');
       const expectedOutput = tc.expected_output.trim().replace(/\r\n/g, '\n').replace(/\r/g, '\n');
@@ -117,13 +86,11 @@ const executeAgainstCases = async (code, testCases) => {
       });
     }
   } catch (err) {
-    console.log('Execution error:', err.message);
     for (const tc of testCases) {
       results.push({ passed: false, expected: tc.expected_output, actual: err.message, status: 'Error' });
     }
   } finally {
-    // Cleanup temp files
-    exec(`rmdir /s /q "${tmpDir}"`);
+    exec(`rm -rf "${tmpDir}"`);  
   }
 
   return results;

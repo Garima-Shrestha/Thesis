@@ -96,10 +96,15 @@ router.get('/:id/solution', authMiddleware, (req, res) => {
     WHERE user_id = ? AND challenge_id = ?
   `).get(userId, req.params.id).count;
 
-  if (attemptCount < 3) {
-    return res.status(403).json({ 
+  const alreadySolved = db.prepare(`
+    SELECT id FROM submissions
+    WHERE user_id = ? AND challenge_id = ? AND status = 'accepted'
+  `).get(userId, req.params.id);
+
+  if (!alreadySolved && attemptCount < 3) {
+    return res.status(403).json({
       message: `You need at least 3 attempts to unlock the solution. You have ${attemptCount} so far.`,
-      attempts: attemptCount 
+      attempts: attemptCount
     });
   }
 

@@ -16,14 +16,14 @@ router.post('/run', authMiddleware, async (req, res) => {
   }
 });
 
-// Submit against all test cases [This requires the code to have at least one meaningful Java keyword and be long enough (needs atleast 80 non-whitespace chars).]
+// Submit against all test cases [Requires at least one meaningful Python keyword (print, input, def, etc.) and 15+ non-whitespace, non-comment chars.]
 router.post('/submit', authMiddleware, async (req, res) => {
   try {
     const { code, challengeId } = req.body;
-    const strippedCode = code.replace(/\/\/.*$/gm, '').replace(/\s/g, '');
-    const hasScanner = code.includes('Scanner') || code.includes('System.out') || code.includes('return') || code.includes('for') || code.includes('while') || code.includes('if');
-    if (!hasScanner || strippedCode.length < 80) {
-      return res.status(400).json({ message: 'Please write a proper solution before submitting. Your code seems incomplete.' });
+    const strippedCode = code.replace(/#.*$/gm, '').replace(/\s/g, '');
+    const hasMeaningfulContent = code.includes('print') || code.includes('input') || code.includes('return') || code.includes('def') || code.includes('for') || code.includes('while') || code.includes('if');
+    if (!hasMeaningfulContent || strippedCode.length < 15) {
+      return res.status(400).json({ message: 'Please write a proper Python solution before submitting. Your code seems incomplete.' });
     }
     const result = await submitCode(req.user.id, challengeId, code);
     res.json(result);

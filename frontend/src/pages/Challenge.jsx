@@ -5,11 +5,7 @@ import api from '../api/axios';
 import ReactMarkdown from 'react-markdown';
 import useStore from '../store/useStore';
 
-const DEFAULT_CODE = `public class Main {
-    public static void main(String[] args) {
-        // Write your solution here
-    }
-}`;
+const DEFAULT_CODE = `# Write your solution here\n`;
 
 export default function Challenge() {
   const { id } = useParams();
@@ -136,7 +132,7 @@ export default function Challenge() {
         <div className="editor-section">
           <Editor
             height="400px"
-            language="java"
+            language="python"
             value={code}
             onChange={val => {
              setCode(val);
