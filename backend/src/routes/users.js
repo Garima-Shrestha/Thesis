@@ -24,6 +24,30 @@ router.get('/profile', authMiddleware, (req, res) => {
   res.json({ ...user, badges });
 });
 
+router.get('/activity-recent', authMiddleware, (req, res) => {
+  const recent = db.prepare(`
+    SELECT c.title, c.topic_tag, c.xp_reward, MIN(s.submitted_at) as solved_at
+    FROM submissions s
+    JOIN challenges c ON c.id = s.challenge_id
+    WHERE s.user_id = ? AND s.status = 'accepted'
+    GROUP BY s.challenge_id
+    ORDER BY solved_at DESC
+    LIMIT 3
+  `).all(req.user.id);
+  res.json(recent);
+});
+
+router.get('/activity', authMiddleware, (req, res) => {
+  const submissions = db.prepare(`
+    SELECT DISTINCT date(submitted_at) as day
+    FROM submissions
+    WHERE user_id = ? AND status = 'accepted'
+    ORDER BY day DESC
+    LIMIT 90
+  `).all(req.user.id);
+  res.json(submissions.map(s => s.day));
+});
+
 router.get('/leaderboard', authMiddleware, (req, res) => {
   const users = db.prepare(`
     SELECT id, display_name, total_xp, weekly_xp, current_level, problems_solved
