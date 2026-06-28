@@ -676,36 +676,6 @@ function StudyBuddy({ state, progress }) {
                             </>
                         );
                     })()}
-                    {/* Roof beams */}
-                    {/* <line
-                        x1="178"
-                        y1={90 + (1 - roof) * 25}
-                        x2="205"
-                        y2={72 + (1 - roof) * 25}
-                        stroke="#8b5e3c"
-                        strokeWidth="3"
-                        opacity={roof}
-                    />
-
-
-                    <line
-                        x1="232"
-                        y1={90 + (1 - roof) * 25}
-                        x2="205"
-                        y2={72 + (1 - roof) * 25}
-                        stroke="#8b5e3c"
-                        strokeWidth="3"
-                        opacity={roof}
-                    /> */}
-
-
-                    {/* Roof */}
-                    {/* {roof > 0 && (
-                        <polygon
-                            points={`176,90 ${206},${68 - (16 * roof)} 236,90`}
-                            fill="#b65b38"
-                        />
-                    )} */}
 
                     {/* Roof beams appear first */}
                     {roof > 0 && (() => {
@@ -731,37 +701,6 @@ function StudyBuddy({ state, progress }) {
                             />
                         );
                     })()}
-
-
-                    {/* Roof overhang */}
-                    {/* <rect
-                        x="174"
-                        y="89"
-                        width="64"
-                        height="3"
-                        fill="#8d472b"
-                        opacity={roof}
-                    /> */}
-
-
-                    {/* Roof ridge */}
-                    {/* <line
-                        x1="206"
-                        y1={68 - (16 * roof)}
-                        x2="206"
-                        y2="90"
-                        stroke="#8d472b"
-                        strokeWidth="1.2"
-                        opacity={roof}
-                    /> */}
-
-
-                    {/* Roof shadow */}
-                    {/* <polygon
-                        points={`206,${66 - (18 * roof)} 236,90 232,94 206,72`}
-                        fill="#96452a"
-                        opacity={roof}
-                    /> */}
 
                     {/* Roof overhang only after roof surface is mostly there */}
                     {roof > 0 && (
@@ -910,12 +849,7 @@ function StudyBuddy({ state, progress }) {
 
 
                 <>
-                    {/* Bush */}
-                    {/* <circle cx="168" cy="128" r="6" fill="#4ade80"/>
-                    <circle cx="174" cy="125" r="5" fill="#22c55e"/>
-                    <circle cx="180" cy="128" r="6" fill="#4ade80"/> */}
-
-                    {/* Bush — grows from 0.75 */}
+                    {/* Bush grows from 0.75 */}
                     {(() => {
                     const bs = Math.min(Math.max((progress - 0.75) / 0.15, 0), 1);
                     if (bs === 0) return null;

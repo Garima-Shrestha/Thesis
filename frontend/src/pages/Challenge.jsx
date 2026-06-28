@@ -53,7 +53,7 @@ export default function Challenge() {
   const [solution, setSolution] = useState(null);
   const [solutionError, setSolutionError] = useState('');
   const [attemptCount, setAttemptCount] = useState(0);
-  
+
   const [robotState, setRobotState] = useState('idle');
   const typingTimer = useRef(null);
 
@@ -201,7 +201,7 @@ export default function Challenge() {
       {/* Body */}
       <div className="chal-body">
 
-        {/* LEFT — Briefing panel */}
+        {/* LEFT: Briefing panel */}
         <div className="chal-briefing">
 
           <p className="chal-section-label">Objective</p>
@@ -269,7 +269,7 @@ export default function Challenge() {
 
         </div>
 
-        {/* RIGHT — Coding arena */}
+        {/* RIGHT: Coding arena */}
         <div className="chal-arena">
 
           <div className="chal-editor-card">
