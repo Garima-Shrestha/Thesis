@@ -7,22 +7,37 @@ import useStore from '../store/useStore';
 function HouseScene({ solved, total }) {
   const canvasRef = useRef(null);
   const animRef = useRef(null);
-  const effectiveTotal = total || 8;
-  const pct = Math.min(solved / effectiveTotal, 1);
-  const s = Math.floor(pct * 8);
+  // const effectiveTotal = total || 8;
+  // const pct = Math.min(solved / effectiveTotal, 1);
+  // const s = Math.floor(pct * 8);
+
+  const effectiveTotal = Math.max(total, 1);
+  const progress = Math.min(solved / effectiveTotal, 1);
+
+  // Continuous progress (0 → 1)
+  const ground = Math.min(progress / 0.10, 1);
+  const foundation = Math.max(0, Math.min((progress - 0.10) / 0.10, 1));
+  const walls = Math.max(0, Math.min((progress - 0.20) / 0.20, 1));
+  const roof = Math.max(0, Math.min((progress - 0.40) / 0.20, 1));
+  const details = Math.max(0, Math.min((progress - 0.60) / 0.20, 1));
+  const world = Math.max(0, Math.min((progress - 0.80) / 0.20, 1));
+
+  // Keep the existing day/night logic
+  const pct = progress;
+  const s = Math.floor(progress * 8);
 
   const isNight = s >= 5;
   const isDusk = s === 4;
 
   const stages = [
-    "Your plot awaits — solve a challenge to begin!",
-    "Foundation laid — the journey begins!",
-    "Walls rising — keep going!",
-    "Roof on — looking like a home!",
-    "Windows and door — almost there!",
-    "The sun sets — garden is blooming!",
-    "Night falls — trees stand tall!",
-    "Stars out — your home glows!",
+    "Your plot awaits: solve a challenge to begin!",
+    "Foundation laid: the journey begins!",
+    "Walls rising: keep going!",
+    "Roof on: looking like a home!",
+    "Windows and door: almost there!",
+    "The sun sets: garden is blooming!",
+    "Night falls: trees stand tall!",
+    "Stars out: your home glows!",
     "Dream home complete under the stars!",
   ];
 
@@ -34,6 +49,8 @@ function HouseScene({ solved, total }) {
 
     const draw = () => {
       frame++;
+      const birdX = (frame * 0.45) % 760 - 40;
+      const wing = Math.sin(frame * 0.18) * 4;
       const W = 680, H = 320;
       ctx.clearRect(0, 0, W, H);
 
@@ -123,7 +140,7 @@ function HouseScene({ solved, total }) {
       ctx.fillStyle = gGrad;
       ctx.fillRect(0, groundY, W, H - groundY);
 
-      // Ground texture — grass blades
+      // Ground texture: grass blades
       if (s >= 1) {
         ctx.strokeStyle = s >= 5 ? '#15803d' : '#15803d';
         ctx.lineWidth = 1;
@@ -136,10 +153,10 @@ function HouseScene({ solved, total }) {
         }
       }
 
-      // ── HOUSE BUILDING ──
+      // HOUSE BUILDING 
 
-      if (s >= 1) {
-        // Foundation — stone texture
+      if (foundation > 0) {
+        // Foundation: stone texture
         ctx.fillStyle = '#78716c';
         ctx.fillRect(195, 242, 290, 20);
         ctx.fillStyle = '#a8a29e';
@@ -149,8 +166,8 @@ function HouseScene({ solved, total }) {
         }
       }
 
-      if (s >= 2) {
-        // Main wall — brick-like
+      if (walls > 0) {
+        // Main wall brick-like
         const wallColor = s >= 5 ? '#92400e' : '#d97706';
         const wallShade = s >= 5 ? '#78350f' : '#b45309';
         ctx.fillStyle = wallColor;
@@ -177,8 +194,8 @@ function HouseScene({ solved, total }) {
         ctx.fillRect(463, 170, 22, 74);
       }
 
-      if (s >= 3) {
-        // Roof — tiled look
+      if (roof > 0) {
+        // Roof tiled look
         ctx.fillStyle = s >= 5 ? '#991b1b' : '#dc2626';
         ctx.beginPath();
         ctx.moveTo(175, 172); ctx.lineTo(505, 172); ctx.lineTo(340, 95);
@@ -205,8 +222,8 @@ function HouseScene({ solved, total }) {
         ctx.fillRect(325, 120, 30, 55);
       }
 
-      if (s >= 4) {
-        // Windows — glowing at night
+      if (details > 0) {
+        // Windows: glowing at night
         const winGlow = s >= 5 ? '#fef08a' : '#bae6fd';
         const winFrame = s >= 5 ? '#b45309' : '#0369a1';
 
@@ -254,7 +271,7 @@ function HouseScene({ solved, total }) {
         ctx.strokeRect(321, 196, 17, 22);
         ctx.strokeRect(342, 196, 17, 22);
 
-        // Path to door — cobblestone
+        // Path to door: cobblestone
         ctx.fillStyle = '#a8a29e';
         ctx.fillRect(306, 244, 68, 18);
         const stones = [[308,246],[322,248],[336,245],[350,247],[364,246],[308,254],[322,252],[336,255],[350,253],[364,254]];
@@ -264,15 +281,22 @@ function HouseScene({ solved, total }) {
         });
       }
 
-      if (s >= 5) {
-        // Garden left — bushes
+      if (world > 0.10) {
+        const plantScale = Math.min(world / 0.35, 1);
+        // Garden left: bushes
         const bushGreen = s >= 6 ? '#15803d' : '#16a34a';
         ctx.fillStyle = '#14532d';
         ctx.beginPath(); ctx.ellipse(148, 256, 42, 18, 0, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = bushGreen;
-        ctx.beginPath(); ctx.ellipse(158, 248, 32, 18, 0, 0, Math.PI * 2); ctx.fill();
+        // ctx.beginPath(); ctx.ellipse(158, 248, 32, 18, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse( 158, 248 + (1 - plantScale) * 14, 32 * plantScale, 18 * plantScale, 0, 0, Math.PI * 2);
+        ctx.fill();
         ctx.fillStyle = '#166534';
-        ctx.beginPath(); ctx.ellipse(138, 250, 26, 15, 0, 0, Math.PI * 2); ctx.fill();
+        // ctx.beginPath(); ctx.ellipse(138, 250, 26, 15, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse( 138, 250 + (1 - plantScale) * 12, 26 * plantScale, 15 * plantScale, 0, 0, Math.PI * 2);
+        ctx.fill();
         ctx.fillStyle = '#92400e'; ctx.fillRect(148, 255, 5, 12);
 
         // Flowers
@@ -294,7 +318,7 @@ function HouseScene({ solved, total }) {
         ctx.fillStyle = '#92400e'; ctx.fillRect(525, 255, 5, 12);
       }
 
-      if (s >= 6) {
+      if (world > 0.35) {
         // Left tree
         ctx.fillStyle = '#92400e'; ctx.fillRect(98, 210, 9, 52);
         ctx.fillStyle = '#14532d';
@@ -303,6 +327,7 @@ function HouseScene({ solved, total }) {
         ctx.beginPath(); ctx.ellipse(94, 205, 20, 26, 0, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = '#16a34a';
         ctx.beginPath(); ctx.ellipse(110, 202, 18, 24, 0, 0, Math.PI * 2); ctx.fill();
+        
 
         // Right tree
         ctx.fillStyle = '#92400e'; ctx.fillRect(572, 205, 9, 57);
@@ -314,7 +339,7 @@ function HouseScene({ solved, total }) {
         ctx.beginPath(); ctx.ellipse(584, 198, 20, 26, 0, 0, Math.PI * 2); ctx.fill();
       }
 
-      if (s >= 7) {
+      if (world > 0.60) {
         // Chimney with animated smoke
         ctx.fillStyle = '#78716c';
         ctx.fillRect(388, 100, 26, 40);
@@ -357,7 +382,7 @@ function HouseScene({ solved, total }) {
         ctx.fillStyle = '#78716c'; ctx.fillRect(175, 254, 4, 10);
       }
 
-      if (s >= 8) {
+      if (world > 0.90) {
         // Window light glow pulses
         const glowAlpha = 0.1 + 0.06 * Math.sin(frame * 0.04);
         ctx.fillStyle = `rgba(254,240,138,${glowAlpha})`;
@@ -379,6 +404,67 @@ function HouseScene({ solved, total }) {
           ctx.arc(fx + drift, fy + drifty, 6, 0, Math.PI * 2);
           ctx.fill();
         });
+
+        // Blue bird sitting on the left side of the roof
+        ctx.save();
+
+        ctx.translate(580, 170);
+        ctx.scale(-1, 1);
+
+        // body
+        ctx.fillStyle = "#60a5fa";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 7, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // wing
+        ctx.fillStyle = "#3b82f6";
+        ctx.beginPath();
+        ctx.ellipse(-1, 0, 3, 2, -0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // head
+        ctx.fillStyle = "#60a5fa";
+        ctx.beginPath();
+        ctx.arc(6, -4, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // eye
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(7, -5, 0.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // beak
+        ctx.fillStyle = "#fbbf24";
+        ctx.beginPath();
+        ctx.moveTo(9, -4);
+        ctx.lineTo(13, -3);
+        ctx.lineTo(9, -1);
+        ctx.closePath();
+        ctx.fill();
+
+        // tail
+        ctx.strokeStyle = "#3b82f6";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-6, 0);
+        ctx.lineTo(-11, -3);
+        ctx.moveTo(-6, 1);
+        ctx.lineTo(-11, 2);
+        ctx.stroke();
+
+        // legs
+        ctx.strokeStyle = "#14532d";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(-1, 4);
+        ctx.lineTo(-1, 7);
+        ctx.moveTo(2, 4);
+        ctx.lineTo(2, 7);
+        ctx.stroke();
+
+        ctx.restore();
       }
 
       animRef.current = requestAnimationFrame(draw);
@@ -426,7 +512,7 @@ function LevelUpBanner({ level, onDone }) {
       <div className="levelup-box">
         <div className="levelup-label">Level Up</div>
         <div className="levelup-number">{level}</div>
-        <div className="levelup-sub">Keep going — your home is growing!</div>
+        <div className="levelup-sub">Keep going: your home is growing!</div>
       </div>
     </div>
   );
@@ -509,7 +595,7 @@ function WorldMap({ groups, navigate }) {
               <div className="zone-bridge">
                 <div className={`bridge-line ${allSolved ? 'bridge-done' : ''}`} />
                 <span className={`bridge-label ${allSolved ? 'bridge-label-done' : ''}`}>
-                  {allSolved ? 'Zone complete — next zone unlocked!' : 'Complete all challenges to unlock the next zone'}
+                  {allSolved ? 'Zone complete: next zone unlocked!' : 'Complete all challenges to unlock the next zone'}
                 </span>
                 <div className={`bridge-line ${allSolved ? 'bridge-done' : ''}`} />
               </div>
