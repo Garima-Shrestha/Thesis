@@ -1,166 +1,3 @@
-// import { useEffect, useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import api from '../api/axios';
-// import useStore from '../store/useStore';
-
-
-// export default function Admin() {
-//   const [challenges, setChallenges] = useState([]);
-//   const [users, setUsers] = useState([]);
-//   const [groups, setGroups] = useState([]);
-//   const [tab, setTab] = useState('challenges');
-//   const [form, setForm] = useState({
-//     title: '', description: '', difficulty: 'beginner',
-//     level_required: 1, xp_reward: 30, topic_tag: '', group_id: '',
-//     test_cases: [{ input: '', expected_output: '', is_sample: true }]
-//   });
-//   const [message, setMessage] = useState('');
-//   const { user } = useStore();
-//   const navigate = useNavigate();
-
-
-//   useEffect(() => {
-//     if (user?.role !== 'admin') { navigate('/dashboard'); return; }
-//     fetchData();
-//   }, []);
-
-
-//   const fetchData = async () => {
-//     const [cRes, uRes, gRes] = await Promise.all([
-//       api.get('/admin/challenges'),
-//       api.get('/admin/users'),
-//       api.get('/challenges'),
-//     ]);
-//     setChallenges(cRes.data);
-//     setUsers(uRes.data);
-//     setGroups(gRes.data);
-//   };
-
-
-//   const handleAddTestCase = () => {
-//     setForm({ ...form, test_cases: [...form.test_cases, { input: '', expected_output: '', is_sample: false }] });
-//   };
-
-
-//   const handleTestCaseChange = (index, field, value) => {
-//     const updated = [...form.test_cases];
-//     updated[index][field] = value;
-//     setForm({ ...form, test_cases: updated });
-//   };
-
-
-//   const handleCreate = async (e) => {
-//     e.preventDefault();
-//     setMessage('');
-//     try {
-//       await api.post('/admin/challenges', {
-//         ...form,
-//         group_id: form.group_id ? parseInt(form.group_id) : null,
-//         level_required: parseInt(form.level_required),
-//         xp_reward: parseInt(form.xp_reward),
-//       });
-//       setMessage('Challenge created successfully.');
-//       fetchData();
-//     } catch (err) {
-//       setMessage(err.response?.data?.message || 'Error creating challenge.');
-//     }
-//   };
-
-
-//   const handleDelete = async (id) => {
-//     if (!confirm('Delete this challenge?')) return;
-//     await api.delete(`/admin/challenges/${id}`);
-//     fetchData();
-//   };
-
-
-//   const handlePublishToggle = async (c) => {
-//     await api.put(`/admin/challenges/${c.id}`, { ...c, is_published: c.is_published ? 0 : 1 });
-//     fetchData();
-//   };
-
-
-//   return (
-//     <div className="admin-page">
-//       <button onClick={() => navigate('/dashboard')}>← Back</button>
-//       <h2>⚙️ Admin Panel</h2>
-//       <div className="admin-tabs">
-//         <button className={tab === 'challenges' ? 'active' : ''} onClick={() => setTab('challenges')}>Challenges</button>
-//         <button className={tab === 'create' ? 'active' : ''} onClick={() => setTab('create')}>Create Challenge</button>
-//         <button className={tab === 'users' ? 'active' : ''} onClick={() => setTab('users')}>Users</button>
-//       </div>
-
-
-//       {tab === 'challenges' && (
-//         <div className="admin-list">
-//           {challenges.map(c => (
-//             <div key={c.id} className="admin-item">
-//               <span>{c.title}</span>
-//               <span className={`difficulty ${c.difficulty}`}>{c.difficulty}</span>
-//               <span>{c.is_published ? '✅ Published' : '⏸ Draft'}</span>
-//               <button onClick={() => handlePublishToggle(c)}>
-//                 {c.is_published ? 'Unpublish' : 'Publish'}
-//               </button>
-//               <button className="delete-btn" onClick={() => handleDelete(c.id)}>Delete</button>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-
-
-//       {tab === 'create' && (
-//         <form className="admin-form" onSubmit={handleCreate}>
-//           {message && <p className="form-message">{message}</p>}
-//           <input placeholder="Title" value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
-//           <textarea placeholder="Description" value={form.description} onChange={e => setForm({...form, description: e.target.value})} required />
-//           <select value={form.difficulty} onChange={e => setForm({...form, difficulty: e.target.value})}>
-//             <option value="beginner">Beginner</option>
-//             <option value="intermediate">Intermediate</option>
-//             <option value="advanced">Advanced</option>
-//           </select>
-//           <select value={form.group_id} onChange={e => setForm({...form, group_id: e.target.value})}>
-//             <option value="">No Group</option>
-//             {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
-//           </select>
-//           <input type="number" placeholder="Level Required" value={form.level_required} onChange={e => setForm({...form, level_required: e.target.value})} />
-//           <input type="number" placeholder="XP Reward" value={form.xp_reward} onChange={e => setForm({...form, xp_reward: e.target.value})} />
-//           <input placeholder="Topic Tag" value={form.topic_tag} onChange={e => setForm({...form, topic_tag: e.target.value})} required />
-//           <h4>Test Cases</h4>
-//           {form.test_cases.map((tc, i) => (
-//             <div key={i} className="test-case-form">
-//               <input placeholder="Input (leave empty if none)" value={tc.input} onChange={e => handleTestCaseChange(i, 'input', e.target.value)} />
-//               <input placeholder="Expected Output" value={tc.expected_output} onChange={e => handleTestCaseChange(i, 'expected_output', e.target.value)} required />
-//               <label>
-//                 <input type="checkbox" checked={tc.is_sample} onChange={e => handleTestCaseChange(i, 'is_sample', e.target.checked)} />
-//                 Sample test case
-//               </label>
-//             </div>
-//           ))}
-//           <button type="button" onClick={handleAddTestCase}>+ Add Test Case</button>
-//           <button type="submit">Create Challenge</button>
-//         </form>
-//       )}
-
-
-//       {tab === 'users' && (
-//         <div className="admin-list">
-//           {users.map(u => (
-//             <div key={u.id} className="admin-item">
-//               <span>{u.display_name}</span>
-//               <span>{u.email}</span>
-//               <span className={u.role === 'admin' ? 'admin-badge' : ''}>{u.role}</span>
-//               <span>Level {u.current_level}</span>
-//               <span>{u.problems_solved} solved</span>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
@@ -303,23 +140,23 @@ export default function Admin() {
 
   return (
     <div className="admin-page">
-      <div className="admin-header">
-        <h2>⚙️ Admin Panel</h2>
-        <div style={{display:'flex', gap:'0.75rem'}}>
-          <button className="admin-user-btn" onClick={() => navigate('/dashboard')}>👤 View as Student</button>
-          <button className="admin-user-btn" style={{background:'#ef4444'}} onClick={() => { logout(); navigate('/login'); }}>Logout</button>
-        </div>
+      <div className="admin-header" style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.5rem'}}>
+          <h2>Admin Panel</h2>
+          <div style={{display:'flex', gap:'0.75rem'}}>
+          <button className="admin-header-btn" onClick={() => navigate('/dashboard')}>View as Student</button>
+          <button className="admin-header-btn admin-header-btn--danger" onClick={() => { logout(); navigate('/login'); }}>Logout</button>
+       </div>
       </div>
 
       <div className="admin-tabs">
         <button className={tab === 'challenges' ? 'active' : ''} onClick={() => { setTab('challenges'); setMessage(''); }}>
-          📋 Challenges ({challenges.length})
+          Challenges ({challenges.length})
         </button>
         <button className={tab === 'create' ? 'active' : ''} onClick={() => { if (!editingChallenge) resetForm(); setTab('create'); setMessage(''); }}>
-          ➕ {editingChallenge ? 'Edit Challenge' : 'Create Challenge'}
+          {editingChallenge ? 'Edit Challenge' : 'Create Challenge'}
         </button>
         <button className={tab === 'users' ? 'active' : ''} onClick={() => setTab('users')}>
-          👥 Users ({users.length})
+          Users ({users.length})
         </button>
       </div>
 
@@ -327,28 +164,37 @@ export default function Admin() {
         <div>
           <div className="admin-legend">
           </div>
-          <div className="admin-list">
-            {challenges.length === 0 && <p style={{color:'#94a3b8'}}>No challenges yet. Create one!</p>}
+          <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Difficulty</th>
+              <th>XP</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {challenges.length === 0 && (
+              <tr><td colSpan="5" style={{color:'#94a3b8', textAlign:'center'}}>No challenges yet. Create one.</td></tr>
+            )}
             {challenges.map(c => (
-              <div key={c.id} className="admin-item">
-                <div className="admin-item-info">
-                  <span className="admin-item-title">{c.title}</span>
-                  <span className={`difficulty ${c.difficulty}`}>{c.difficulty}</span>
-                  <span className="admin-xp">🏆 {c.xp_reward} XP reward</span>
-                  <span className={c.is_published ? 'status-published' : 'status-draft'}>
-                    {c.is_published ? '✅ Published' : '⏸ Draft'}
-                  </span>
-                </div>
-                <div className="admin-item-actions">
-                  <button onClick={() => handleEdit(c)}>✏️ Edit</button>
+              <tr key={c.id}>
+                <td>{c.title}</td>
+                <td><span className={`difficulty ${c.difficulty}`}>{c.difficulty}</span></td>
+                <td>{c.xp_reward} XP</td>
+                <td><span className={c.is_published ? 'status-published' : 'status-draft'}>{c.is_published ? 'Published' : 'Draft'}</span></td>
+                <td className="admin-table-actions">
+                  <button onClick={() => handleEdit(c)}>Edit</button>
                   <button onClick={() => handlePublishToggle(c)} className={c.is_published ? 'unpublish-btn' : 'publish-btn'}>
                     {c.is_published ? 'Unpublish' : 'Publish'}
                   </button>
-                  <button className="delete-btn" onClick={() => handleDelete(c.id)}>🗑️ Delete</button>
-                </div>
-              </div>
+                  <button className="delete-btn" onClick={() => handleDelete(c.id)}>Delete</button>
+                </td>
+              </tr>
             ))}
-          </div>
+          </tbody>
+        </table>
         </div>
       )}
 
@@ -413,7 +259,7 @@ export default function Admin() {
           </div>
           {message && (
             <div className={messageType === 'success' ? 'form-message' : 'form-message-error'}>
-              {message}
+              <span>{message}</span>
               {messageType === 'success' && (
                 <button type="button" className="goto-challenges-btn" onClick={() => { setTab('challenges'); setMessage(''); }}>
                   Go to Challenges tab
@@ -425,19 +271,28 @@ export default function Admin() {
       )}
 
       {tab === 'users' && (
-        <div className="admin-list">
+        <table className="admin-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Level</th>
+            <th>Solved</th>
+          </tr>
+        </thead>
+        <tbody>
           {users.map(u => (
-            <div key={u.id} className="admin-item">
-              <div className="admin-item-info">
-                <span className="admin-item-title">{u.display_name}</span>
-                <span style={{color:'#94a3b8'}}>{u.email}</span>
-                <span className={u.role === 'admin' ? 'admin-badge' : ''}>{u.role === 'admin' ? '⚙️ Admin' : '👤 Student'}</span>
-                <span>Level {u.current_level}</span>
-                <span>{u.problems_solved} solved</span>
-              </div>
-            </div>
+            <tr key={u.id}>
+              <td>{u.display_name}</td>
+              <td style={{color:'#64748b'}}>{u.email}</td>
+              <td><span className={u.role === 'admin' ? 'admin-badge' : ''}>{u.role === 'admin' ? 'Admin' : 'Student'}</span></td>
+              <td>{u.current_level}</td>
+              <td>{u.problems_solved}</td>
+            </tr>
           ))}
-        </div>
+        </tbody>
+      </table>
       )}
     </div>
   );

@@ -208,11 +208,12 @@ body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0;
 .leaderboard-row.top-three { background: #1e3a5f; }
 .rank { font-size: 1.2rem; }
 
-.admin-page { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+.admin-page { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .admin-page > button { margin-bottom: 1rem; padding: 0.5rem 1rem; background: #334155; color: white; border: none; border-radius: 8px; cursor: pointer; }
 .admin-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
 .admin-tabs button { padding: 0.5rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; background: #334155; color: white; }
-.admin-tabs button.active { background: #6366f1; }
+.admin-tabs button.active { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
 .admin-list { display: flex; flex-direction: column; gap: 0.5rem; }
 .admin-item { display: flex; gap: 1rem; align-items: center; padding: 0.75rem 1rem; background: #1e293b; border-radius: 8px; flex-wrap: wrap; }
 .admin-item button { padding: 0.25rem 0.75rem; border: none; border-radius: 6px; cursor: pointer; background: #334155; color: white; }
@@ -1008,3 +1009,100 @@ body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0;
 .chal-robot-speech--error { color: #f87171; }
 .chal-robot-speech--success { color: #34d399; }
 .chal-robot-speech--idle { color: #64748b; }
+
+
+/* Admin table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1e293b;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #334155;
+  font-size: 0.85rem;
+}
+.admin-table th {
+  background: #0f172a;
+  color: #475569;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+.admin-table td {
+  padding: 0.75rem 1rem;
+  color: #cbd5e1;
+  border-bottom: 1px solid #0f172a;
+  vertical-align: middle;
+}
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table tr:hover td { background: #162032; }
+.admin-table-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.admin-table-actions button {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #334155;
+  color: #e2e8f0;
+  transition: background 0.15s;
+}
+.admin-table-actions button:hover { background: #475569; }
+.admin-table-actions .publish-btn { background: #1e3a5f; color: #93c5fd; }
+.admin-table-actions .publish-btn:hover { background: #1d4ed8; color: white; }
+.admin-table-actions .unpublish-btn { background: #1e293b; color: #64748b; }
+.admin-table-actions .delete-btn { background: #450a0a; color: #fca5a5; }
+.admin-table-actions .delete-btn:hover { background: #7f1d1d; }
+
+.status-published { color: #22c55e; font-size: 0.75rem; font-weight: 600; }
+.status-draft { color: #64748b; font-size: 0.75rem; }
+
+/* Admin header buttons */
+.admin-header-btn {
+  padding: 0.45rem 1rem;
+  border-radius: 7px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #e2e8f0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.admin-header-btn:hover { background: #334155; }
+.admin-header-btn--danger {
+  background: #450a0a;
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}
+.admin-header-btn--danger:hover { background: #7f1d1d; color: white; }
+
+/* form-message spacing fix */
+.form-message {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.form-message-error {
+  padding: 0.75rem;
+  background: #450a0a;
+  border-radius: 8px;
+  color: #fca5a5;
+}
+.goto-challenges-btn {
+  padding: 0.35rem 0.9rem;
+  background: #166534;
+  color: #bbf7d0;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.goto-challenges-btn:hover { background: #15803d; }
