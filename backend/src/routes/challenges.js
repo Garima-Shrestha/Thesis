@@ -84,7 +84,20 @@ router.get('/:id', authMiddleware, (req, res) => {
     WHERE user_id = ? AND challenge_id = ? AND status = 'accepted'
   `).get(userId, req.params.id);
 
-  res.json({ ...challenge, sample_test_cases: testCases, attempt_count: attemptCount, is_solved: !!isSolved });
+  const totalSolvedCount = db.prepare(`
+    SELECT COUNT(DISTINCT challenge_id) as count
+    FROM submissions
+    WHERE user_id = ?
+    AND status = 'accepted'
+  `).get(userId).count;
+
+  const totalQuestionCount = db.prepare(`
+    SELECT COUNT(*) as count
+    FROM challenges
+    WHERE is_published = 1
+  `).get().count;
+
+  res.json({ ...challenge, sample_test_cases: testCases, attempt_count: attemptCount, is_solved: !!isSolved, total_solved_count: totalSolvedCount, total_question_count: totalQuestionCount });
 });
 
 
