@@ -71,12 +71,18 @@ body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0;
 .node-with-connector { display: flex; align-items: center; }
 .node-and-label { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 
-.challenge-node { width: 56px; height: 56px; border-radius: 50%; border: 3px solid #334155; background: #0f172a; color: #475569; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 700; transition: all 0.2s; flex-shrink: 0; position: relative; }
+.challenge-node { 
+  width: 80px; 
+  height: 80px; 
+  border-radius: 12px;
+  background: transparent;
+  border: none;
+}
 .challenge-node:disabled { cursor: not-allowed; }
-.node-available { border-color: #0f48c2; color: #60a5fa; background: #131c2e; }
 .node-available:hover { transform: scale(1.12); background: #131c2e; border-color: #1b58db; }
-.node-solved { border-color: #22c55e; background: #14532d; color: #bbf7d0; }
 .node-locked { border-color: #1e293b; background: #0a0f1e; color: #1e293b; }
+.node-available { background: transparent; border: none; }
+.node-solved { background: transparent; border: none; }
 
 @keyframes pulse-ring {
   0% { box-shadow: 0 0 0 0 rgba(99,102,241,0.5); }
@@ -92,16 +98,16 @@ body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0;
 .diff-beginner { background: #14532d; color: #86efac; }
 .diff-intermediate { background: #78350f; color: #fde68a; }
 .diff-advanced { background: #7f1d1d; color: #fecaca; }
-.node-xp { font-size: 0.62rem; color: #818cf8; font-weight: 700; font-family: monospace; letter-spacing: 0.1em; }
+.node-xp { font-size: 0.62rem; color: #f59e0b; font-weight: 700; font-family: monospace; letter-spacing: 0.1em; }
 
 .node-connector { width: 36px; height: 3px; background: #1e293b; border-radius: 2px; flex-shrink: 0; margin: 0 2px; position: relative; top: -18px; }
-.connector-done { background: #22c55e; }
+.connector-done { background: #f59e0b; }
 
 .zone-bridge { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 0 0.5rem; }
 .bridge-line { flex: 1; height: 2px; background: #334155; border-radius: 2px; }
-.bridge-done { background: #22c55e; }
+.bridge-done { background: #f59e0b; }
 .bridge-label { font-size: 0.72rem; color: #475569; white-space: nowrap; padding: 0.25rem 0.75rem; border: 1px solid #334155; border-radius: 12px; background: #0f172a; }
-.bridge-label-done { color: #22c55e; border-color: #166534; }
+.bridge-label-done { color: #f2efeb; border-color: #ff6404; }
 
 
 /* XP popup */

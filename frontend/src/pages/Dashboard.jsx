@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import useStore from '../store/useStore';
+import chestImg from '../assets/chest.png';
 
 
 function HouseScene({ solved, total }) {
@@ -564,7 +565,7 @@ function WorldMap({ groups, navigate }) {
                           onClick={() => group.is_unlocked && navigate(`/challenge/${c.id}`)}
                           disabled={!group.is_unlocked}
                         >
-                          {c.is_solved ? (
+                          {/* {c.is_solved ? (
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points="20 6 9 17 4 12"/>
                             </svg>
@@ -574,7 +575,26 @@ function WorldMap({ groups, navigate }) {
                             </svg>
                           ) : (
                             <span className="node-number">{ci + 1}</span>
-                          )}
+                          )} */}
+
+                          {!group.is_unlocked ? (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                          </svg>
+                        ) : (
+                          <img
+                            src={chestImg}
+                            alt="challenge"
+                            style={{
+                              width: '72px',
+                              height: '72px',
+                              objectFit: 'contain',
+                              filter: c.is_solved
+                                ? 'drop-shadow(0 0 3px #d97706)'
+                                : 'brightness(0.55) saturate(0.4) grayscale(0.3)',
+                            }}
+                          />
+                        )}
                         </button>
                         <div className="node-label">
                           <span className="node-title">{c.title}</span>
