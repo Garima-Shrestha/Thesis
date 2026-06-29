@@ -171,4 +171,12 @@ router.post('/ai-assist', authMiddleware, async (req, res) => {
   }
 });
 
+router.post('/deduct-xp', authMiddleware, async (req, res) => {
+  const user = db.prepare('SELECT total_xp, weekly_xp FROM users WHERE id = ?').get(req.user.id);
+  const newTotalXp = Math.max(0, user.total_xp - 5);
+  const newWeeklyXp = Math.max(0, user.weekly_xp - 5);
+  db.prepare('UPDATE users SET total_xp = ?, weekly_xp = ? WHERE id = ?').run(newTotalXp, newWeeklyXp, req.user.id);
+  res.json({ newTotalXp, newWeeklyXp });
+});
+
 export default router;

@@ -54,6 +54,10 @@ export default function Challenge() {
   const [solutionError, setSolutionError] = useState('');
   const [attemptCount, setAttemptCount] = useState(0);
 
+  const [showSolutionPrompt, setShowSolutionPrompt] = useState(false);
+  const [promptDismissedAt, setPromptDismissedAt] = useState(null);
+  const [solutionAccessGranted, setSolutionAccessGranted] = useState(false);
+
   const [robotState, setRobotState] = useState('idle');
   const typingTimer = useRef(null);
 
@@ -138,7 +142,16 @@ export default function Challenge() {
       const res = await api.post('/submissions/submit', { code, challengeId: parseInt(id) });
       setStatus(res.data.status);
       setResults(res.data.results);
-      setAttemptCount(prev => prev + 1);
+      const newCount = attemptCount + 1;
+      setAttemptCount(newCount);
+
+      // Show solution prompt at attempt 5, then every 2 after
+      if (!challenge.is_solved && res.data.status !== 'accepted') {
+        const threshold = promptDismissedAt === null ? 5 : promptDismissedAt + 2;
+        if (newCount >= threshold) {
+          setShowSolutionPrompt(true);
+        }
+      }
       setRobotState(res.data.status === 'accepted' ? 'success' : 'error');
 
       if (res.data.status === 'accepted') {
@@ -169,13 +182,33 @@ export default function Challenge() {
     }
   };
 
+  const handlePromptAccept = async () => {
+    setShowSolutionPrompt(false);
+    setSolutionAccessGranted(true);
+    try {
+      await api.post('/users/deduct-xp');
+    } catch (_) {}
+    try {
+      const res = await api.get(`/challenges/${id}/solution`);
+      setSolution(res.data);
+      setShowSolution(true);
+    } catch (err) {
+      setSolutionError(err.response?.data?.message || 'Could not load solution.');
+    }
+  };
+
+  const handlePromptDecline = () => {
+    setShowSolutionPrompt(false);
+    setPromptDismissedAt(attemptCount);
+  };
+
   if (!challenge) return (
     <div className="chal-loading">Loading mission...</div>
   );
 
   // Logic: unlocked if already solved OR has 3+ attempts
-  const solutionUnlocked = challenge.is_solved || attemptCount >= 3;
-  const attemptsDisplay = Math.min(attemptCount, 3);
+  const solutionUnlocked = challenge.is_solved || solutionAccessGranted;
+  const attemptsDisplay = Math.min(attemptCount, 5);
 
   return (
     <div className="chal-shell">
@@ -237,7 +270,8 @@ export default function Challenge() {
           <div className="chal-solution-area">
             <button
               className={`chal-solution-btn ${solutionUnlocked ? 'chal-solution-btn--on' : 'chal-solution-btn--off'}`}
-              onClick={handleViewSolution}
+              onClick={solutionUnlocked ? handleViewSolution : undefined}
+              disabled={!solutionUnlocked}
             >
              {solutionUnlocked ? (
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -250,9 +284,13 @@ export default function Challenge() {
                   <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                 </svg>
               )}
-              {solutionUnlocked
+              {/* {solutionUnlocked
                 ? (showSolution ? 'Hide solution' : 'View solution')
                 : `Solution locked: ${attemptsDisplay}/3 attempts`
+              } */}
+              {solutionUnlocked
+                ? (showSolution ? 'Hide solution' : 'View solution')
+                : `Solution locked: ${attemptsDisplay}/5 attempts`
               }
             </button>
             {solutionError && <p className="chal-solution-err">{solutionError}</p>}
@@ -439,6 +477,18 @@ export default function Challenge() {
         </div>
       )}
 
+    {showSolutionPrompt && (
+        <div className="solution-prompt-overlay">
+          <div className="solution-prompt-box">
+            <p className="solution-prompt-title">View solution?</p>
+            <p className="solution-prompt-body">You've made {attemptCount} failed attempts. You can view the solution, but <strong>5 XP will be deducted</strong> and you won't earn XP for this challenge.</p>
+            <div className="solution-prompt-actions">
+              <button className="solution-prompt-yes" onClick={handlePromptAccept}>Yes, show it</button>
+              <button className="solution-prompt-no" onClick={handlePromptDecline}>No, keep trying</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
