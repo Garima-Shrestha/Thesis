@@ -28,20 +28,6 @@ export default function Register() {
     }
   };
 
-  // return (
-  //   <div className="auth-container">
-  //     <h2>Register</h2>
-  //     <form onSubmit={handleRegister}>
-  //       <input type="text" placeholder="Display Name" value={form.display_name} onChange={e => setForm({...form, display_name: e.target.value})} required />
-  //       <input type="email" placeholder="Email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} required />
-  //       <input type="password" placeholder="Password (min 8 chars)" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required />
-  //       <input type="password" placeholder="Confirm Password" value={form.confirm_password} onChange={e => setForm({...form, confirm_password: e.target.value})} required />
-  //       {error && <p className="error">{error}</p>}
-  //       <button type="submit">Register</button>
-  //     </form>
-  //     <p>Already have an account? <Link to="/login">Login</Link></p>
-  //   </div>
-  // );
 
 return (
     <div className="auth-page">
