@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import useStore from '../store/useStore';
 import AuthGuide from '../components/AuthGuide';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -36,6 +37,9 @@ return (
         ))}
       </div>
 
+      <div style={{position:'fixed', top:'1rem', right:'1rem', zIndex:10, width:'120px'}}>
+        <ThemeToggle />
+      </div>
       <div className="auth-center auth-center--with-guide">
         <div className="auth-guide-left">
           <div className="auth-platform-name auth-platform-name--left">

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import useStore from '../store/useStore';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Leaderboard() {
   const [users, setUsers] = useState([]);
@@ -27,6 +28,9 @@ export default function Leaderboard() {
 
   return (
     <div className="lb-shell">
+      <div style={{position:'fixed', top:'1rem', right:'1rem', zIndex:10, width:'120px'}}>
+        <ThemeToggle />
+      </div>
       <button className="back-btn" onClick={() => navigate('/dashboard')}>Back to map</button>
       <div className="lb-title">Leaderboard</div>
       <div className="lb-subtitle">Ranked by weekly XP: Resets every Monday</div>

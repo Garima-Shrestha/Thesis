@@ -5,6 +5,7 @@ import api from '../api/axios';
 import ReactMarkdown from 'react-markdown';
 import useStore from '../store/useStore';
 import StudyBuddy from '../components/StudyBuddy';
+import ThemeToggle from '../components/ThemeToggle';
 
 const DEFAULT_CODE = `# Write your solution here\n`;
 
@@ -228,6 +229,7 @@ export default function Challenge() {
         <div className="chal-topbar-right">
           <span className="chal-xp-label">+{challenge.xp_reward} XP</span>
           <span className="chal-attempt-label">Attempts: {attemptCount}</span>
+          <ThemeToggle />
         </div>
       </div>
 

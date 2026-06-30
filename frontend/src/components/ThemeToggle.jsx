@@ -1,0 +1,124 @@
+// import { useEffect, useState } from 'react';
+
+// export default function ThemeToggle() {
+//   const [dark, setDark] = useState(() => {
+//     return localStorage.getItem('theme') !== 'light';
+//   });
+
+//   useEffect(() => {
+//     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+//     localStorage.setItem('theme', dark ? 'dark' : 'light');
+//   }, [dark]);
+
+//   return (
+//     <button
+//       onClick={() => setDark(d => !d)}
+//       style={{
+//         display: 'flex',
+//         alignItems: 'center',
+//         gap: '6px',
+//         padding: '0.45rem 0.75rem',
+//         background: 'var(--bg-card)',
+//         color: 'var(--text-secondary)',
+//         border: '1px solid var(--border-mid)',
+//         borderRadius: '7px',
+//         cursor: 'pointer',
+//         fontSize: '0.78rem',
+//         fontWeight: '600',
+//         transition: 'background 0.15s',
+//         width: '100%',
+//       }}
+//     >
+//       {dark ? (
+//         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+//           <circle cx="12" cy="12" r="5"/>
+//           <line x1="12" y1="1" x2="12" y2="3"/>
+//           <line x1="12" y1="21" x2="12" y2="23"/>
+//           <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+//           <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+//           <line x1="1" y1="12" x2="3" y2="12"/>
+//           <line x1="21" y1="12" x2="23" y2="12"/>
+//           <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+//           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+//         </svg>
+//       ) : (
+//         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+//           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+//         </svg>
+//       )}
+//       {dark ? 'Light mode' : 'Dark mode'}
+//     </button>
+//   );
+// }
+
+
+import { useEffect, useState } from 'react';
+
+const THEMES = ['dark', 'light', 'wood'];
+const ICONS = {
+  dark: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  ),
+  light: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/>
+      <line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  ),
+  wood: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2C12 2 6 9 6 14a6 6 0 0 0 12 0c0-5-6-12-6-12z"/>
+    </svg>
+  ),
+};
+const LABELS = { dark: 'Dark mode', light: 'Light mode', wood: 'Wood mode' };
+
+export default function ThemeToggle() {
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return THEMES.includes(saved) ? saved : 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const cycle = () => {
+    const next = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+    setTheme(next);
+  };
+
+  return (
+    <button
+      onClick={cycle}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '0.45rem 0.75rem',
+        background: 'var(--bg-card)',
+        color: 'var(--text-secondary)',
+        border: '1px solid var(--border-mid)',
+        borderRadius: '7px',
+        cursor: 'pointer',
+        fontSize: '0.78rem',
+        fontWeight: '600',
+        transition: 'background 0.15s',
+        width: '100%',
+      }}
+    >
+      {ICONS[theme]}
+      {LABELS[theme]}
+    </button>
+  );
+}

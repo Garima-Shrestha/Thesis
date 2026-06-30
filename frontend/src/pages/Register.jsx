@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import AuthGuide from '../components/AuthGuide';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Register() {
   const [form, setForm] = useState({ display_name: '', email: '', password: '', confirm_password: '' });
@@ -52,6 +53,9 @@ return (
         ))}
       </div>
 
+      <div style={{position:'fixed', top:'1rem', right:'1rem', zIndex:10, width:'120px'}}>
+        <ThemeToggle />
+      </div>
       <div className="auth-center auth-center--with-guide">
         <div className="auth-guide-left">
           <div className="auth-platform-name auth-platform-name--left">

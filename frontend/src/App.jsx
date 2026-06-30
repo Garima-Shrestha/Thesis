@@ -6,6 +6,7 @@ import Challenge from './pages/Challenge';
 import Profile from './pages/Profile';
 import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
+import { useEffect } from 'react';
 
 function PublicRoute({ children }) {
   const token = localStorage.getItem('token');
@@ -22,9 +23,20 @@ function PrivateRoute({ children }) {
   return token ? children : <Navigate to="/login" />;
 }
 
+
+function ThemeLoader() {
+  useEffect(() => {
+    const saved = localStorage.getItem('theme');
+    const valid = ['dark', 'light', 'wood'].includes(saved) ? saved : 'dark';
+    document.documentElement.setAttribute('data-theme', valid);
+  }, []);
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <ThemeLoader />
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />

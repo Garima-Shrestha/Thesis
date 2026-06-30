@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import ThemeToggle from '../components/ThemeToggle';
 
 const RANK_TITLES = [
   { min: 0,    title: 'Newcomer',        color: '#94a3b8' },
@@ -201,7 +202,11 @@ export default function Profile() {
 
   return (
     <div className="gprofile-shell">
+      <div style={{position:'fixed', top:'1rem', right:'1rem', zIndex:10, width:'120px'}}>
+        <ThemeToggle />
+      </div>
       <button className="back-btn" onClick={() => navigate('/dashboard')}>Back to map</button>
+
 
       <div className="gprofile-layout">
 

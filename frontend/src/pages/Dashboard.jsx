@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import useStore from '../store/useStore';
 import chestImg from '../assets/chest.png';
+import ThemeToggle from '../components/ThemeToggle';
 
 
 function HouseScene({ solved, total }) {
@@ -585,6 +586,7 @@ function WorldMap({ groups, navigate }) {
                           <img
                             src={chestImg}
                             alt="challenge"
+                            className="chal-chest-img"
                             style={{
                               width: '72px',
                               height: '72px',
@@ -703,6 +705,7 @@ export default function Dashboard() {
               <button className="nav-btn" onClick={() => navigate('/profile')}>Profile</button>
               <button className="nav-btn" onClick={() => navigate('/leaderboard')}>Leaderboard</button>
               {user?.role === 'admin' && <button className="nav-btn" onClick={() => navigate('/admin')}>Admin</button>}
+              <ThemeToggle />
               <button className="nav-btn nav-btn-danger" onClick={handleLogout}>Logout</button>
             </div>
           </>
