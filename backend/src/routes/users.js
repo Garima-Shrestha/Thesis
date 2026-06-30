@@ -97,7 +97,7 @@ router.post('/ai-assist', authMiddleware, async (req, res) => {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 15000);
 
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        const response = await fetch(config.openRouterApiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -137,7 +137,7 @@ router.post('/ai-assist', authMiddleware, async (req, res) => {
     if (!aiMessage) {
       await new Promise(r => setTimeout(r, 1500));
       try {
-        const retryResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        const retryResponse = await fetch(config.openRouterApiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.openRouterApiKey}` },
           body: JSON.stringify({
