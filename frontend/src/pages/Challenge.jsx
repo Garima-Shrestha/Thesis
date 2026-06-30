@@ -5,9 +5,11 @@ import api from '../api/axios';
 import ReactMarkdown from 'react-markdown';
 import useStore from '../store/useStore';
 import StudyBuddy from '../components/StudyBuddy';
+import SnakeBuddy from '../components/SnakeBuddy';
 import ThemeToggle from '../components/ThemeToggle';
 
 const DEFAULT_CODE = `# Write your solution here\n`;
+const MAX_TYPING_BOOST = 0.45;
 
 function DifficultyStars({ difficulty }) {
   const levels = { beginner: 1, intermediate: 2, advanced: 3 };
@@ -60,7 +62,25 @@ export default function Challenge() {
   const [solutionAccessGranted, setSolutionAccessGranted] = useState(false);
 
   const [robotState, setRobotState] = useState('idle');
+  const [mascotView, setMascotView] = useState(() => localStorage.getItem('mascotView') || 'house');
+  const [mascotHidden, setMascotHidden] = useState(() => localStorage.getItem('mascotHidden') === 'true');
   const typingTimer = useRef(null);
+
+  const toggleMascot = () => {
+    setMascotView(prev => {
+      const next = prev === 'house' ? 'snake' : 'house';
+      localStorage.setItem('mascotView', next);
+      return next;
+    });
+  };
+
+  const toggleMascotHidden = () => {
+    setMascotHidden(prev => {
+      const next = !prev;
+      localStorage.setItem('mascotHidden', String(next));
+      return next;
+    });
+  };
 
   const solvedProgress = totalQuestionCount > 0
     ? totalSolvedCount / totalQuestionCount
@@ -81,6 +101,7 @@ export default function Challenge() {
     Math.max(solvedProgress, solvedProgress + typingProgress),
     1
   );
+  const snakeProgress = Math.min(typingProgress / MAX_TYPING_BOOST, 1);
 
   useEffect(() => {
     api.get(`/challenges/${id}`)
@@ -126,7 +147,9 @@ export default function Challenge() {
     try {
       const res = await api.post('/submissions/run', { code, challengeId: parseInt(id) });
       setResults(res.data.results);
-      setRobotState('idle');
+      const allPassed = res.data.results.every(r => r.passed);
+      setRobotState(allPassed ? 'idle' : 'run_error');
+      if (!allPassed) setTimeout(() => setRobotState('idle'), 1800);
     } catch (err) {
       setStatus('Error running code.');
     }
@@ -242,12 +265,40 @@ export default function Challenge() {
           <p className="chal-section-label">Objective</p>
           <p className="chal-desc">{challenge.description}</p>
 
-          <StudyBuddy
-            state={robotState}
-            progress={houseProgress}
-          />
-          <div style={{ height: '1px', background: '#1e293b', margin: '0.25rem 0 0.5rem' }} />
+          <div className="chal-mascot-area">
+            <div className="chal-mascot-controls">
+              <button className="chal-mascot-toggle" onClick={toggleMascot} type="button">
+                {mascotView === 'house' ? 'Switch to Snake' : 'Switch to House'}
+              </button>
+              <button
+                className="chal-mascot-eye"
+                onClick={toggleMascotHidden}
+                type="button"
+                title={mascotHidden ? 'Show mascot' : 'Hide mascot'}
+              >
+                {mascotHidden ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                )}
+              </button>
+            </div>
+            <div style={{ display: !mascotHidden && mascotView === 'house' ? 'block' : 'none' }}>
+              <StudyBuddy key={id} state={robotState} progress={houseProgress} />
+            </div>
+            <div style={{ display: !mascotHidden && mascotView === 'snake' ? 'block' : 'none' }}>
+              <SnakeBuddy key={id} state={robotState} progress={snakeProgress} />
+            </div>
+          </div>
+          <div style={{ height: '1px', background: 'var(--border-strong)', margin: '0.25rem 0 0.5rem' }} />
 
+          
           <p className="chal-section-label">Sample Cases</p>
 
           <div className="chal-cases">
@@ -286,10 +337,6 @@ export default function Challenge() {
                   <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                 </svg>
               )}
-              {/* {solutionUnlocked
-                ? (showSolution ? 'Hide solution' : 'View solution')
-                : `Solution locked: ${attemptsDisplay}/3 attempts`
-              } */}
               {solutionUnlocked
                 ? (showSolution ? 'Hide solution' : 'View solution')
                 : `Solution locked: ${attemptsDisplay}/5 attempts`
@@ -332,8 +379,7 @@ export default function Challenge() {
                 // Progress based on code length, not keystrokes
                 // So deleting reduces it, typing increases it
                 const codeLength = (val || '').length;
-                const maxTypingBoost = 0.12;
-                const newTypingProgress = Math.min((codeLength / 400) * maxTypingBoost, maxTypingBoost);
+                const newTypingProgress = Math.min((codeLength / 400) * MAX_TYPING_BOOST, MAX_TYPING_BOOST);
 
                 setTypingProgress(newTypingProgress);
                 localStorage.setItem(typingStorageKey, String(newTypingProgress));

@@ -70,6 +70,9 @@ function StudyBuddy({ state, progress }) {
           alignItems: 'flex-end',
           padding: '0.75rem 0',
           width: '100%',
+          height: '380px',
+          minHeight: '380px',
+          flexShrink: 0,
         }}
       >
       <style>{`
@@ -162,6 +165,15 @@ function StudyBuddy({ state, progress }) {
             .dust{
                 animation:dust 2s ease-out infinite;
             }
+            @keyframes house-hammer-swing {
+              0%, 100% { transform: rotate(-25deg); }
+              50% { transform: rotate(8deg); }
+            }
+            .house-hammer-1 { animation: house-hammer-swing 1.6s ease-in-out infinite; transform-origin: 0 0; }
+            .house-hammer-2 { animation: house-hammer-swing 2.0s ease-in-out infinite 1.1s; transform-origin: 0 0; }
+            .house-dust { animation: dust 1.6s ease-out infinite; }
+            .house-dust-2 { animation-delay: 0.4s; }
+            .house-dust-3 { animation-delay: 0.8s; }
         .star1 { animation: star-fly 0.9s ease-out forwards; --sx: -22px; --sy: -24px; }
         .star2 { animation: star-fly 0.9s ease-out forwards 0.1s; --sx: 24px; --sy: -20px; }
         .star3 { animation: star-fly 0.9s ease-out forwards 0.05s; --sx: -10px; --sy: -30px; }
@@ -208,15 +220,13 @@ function StudyBuddy({ state, progress }) {
         }
       `}</style>
 
-
       <svg
-        width="320"
-        height="180"
-        viewBox="0 0 320 180"
+        width="100%"
+        height="100%"
+        viewBox="0 0 400 220"
+        preserveAspectRatio="xMidYMid meet"
       >
 
-
-        {/* <g transform="translate(20,20)"> */}
         <g transform="translate(12,18)">
         <g className="hero-body">
 
@@ -314,26 +324,27 @@ function StudyBuddy({ state, progress }) {
             {/* Hammer handle */}
             <line
                 x1="85" y1="68"
-                x2="96" y2="52"
+                x2="100" y2="48"
                 stroke="#8b5e3c"
-                strokeWidth="3"
+                strokeWidth="4"
                 strokeLinecap="round"
                 className="hero-pencil"
             />
             {/* Hammer head */}
             <rect  
-                x="93" y="46"
-                width="10" height="6"
-                rx="1.5"
+                x="96" y="40"
+                width="16" height="9"
+                rx="2"
                 fill="#64748b"
                 className="hero-pencil"
-                transform="rotate(-30 93 46)"
+                transform="rotate(-30 96 40)"
             />
 
 
             {/* Impact dust */}
-            <circle cx="92" cy="68" r="1.5" fill="#d1d5db" className="dust" opacity="0.7"/>
-            <circle cx="96" cy="65" r="1" fill="#d1d5db" className="dust" opacity="0.5"/>
+            <circle cx="94" cy="66" r="2.5" fill="#d1d5db" className="dust" opacity="0.8"/>
+            <circle cx="99" cy="62" r="2" fill="#d1d5db" className="dust" opacity="0.6"/>
+            <circle cx="91" cy="61" r="1.5" fill="#d1d5db" className="dust" opacity="0.5"/>
         </>
         ) : isThinking ? (
         <>
@@ -536,8 +547,9 @@ function StudyBuddy({ state, progress }) {
         {/* House Area */}
         <g
             id="house"
-            transform={`translate(172, 140) scale(${0.45 + progress * 1.15}) translate(-206, -140)`}
+            transform={`translate(200, 165) scale(${0.55 + progress * 1.6}) translate(-206, -140)`}
         >
+
             {/* Ground */}
             {/* <line x1="155" y1="140" x2="300" y2="140" stroke="#84cc16" strokeWidth="4" strokeLinecap="round"/> */}
            
@@ -573,8 +585,6 @@ function StudyBuddy({ state, progress }) {
 
                 return (
                     <>
-
-
                     {/* Prepared ground */}
                     <rect
                         x="172"
@@ -823,8 +833,28 @@ function StudyBuddy({ state, progress }) {
                     </>
                     )}
                     </>
-                );
+            );
                 })()}
+
+                {isBuilding && progress > 0.05 && progress < 0.95 && (
+                  <g id="house-build-fx">
+                    <g transform="translate(178,128)">
+                      <g className="house-hammer-1">
+                        <line x1="0" y1="0" x2="10" y2="-14" stroke="#8b5e3c" strokeWidth="3" strokeLinecap="round"/>
+                        <rect x="6" y="-20" width="10" height="6" rx="1.5" fill="#64748b" transform="rotate(-30 11 -17)"/>
+                      </g>
+                      <circle cx="2" cy="2" r="2" fill="#d1d5db" className="house-dust house-dust-1"/>
+                      <circle cx="6" cy="-3" r="1.5" fill="#d1d5db" className="house-dust house-dust-2"/>
+                    </g>
+                    <g transform="translate(232,118) scale(-1,1)">
+                      <g className="house-hammer-2">
+                        <line x1="0" y1="0" x2="10" y2="-14" stroke="#8b5e3c" strokeWidth="3" strokeLinecap="round"/>
+                        <rect x="6" y="-20" width="10" height="6" rx="1.5" fill="#64748b" transform="rotate(-30 11 -17)"/>
+                      </g>
+                      <circle cx="2" cy="2" r="2" fill="#d1d5db" className="house-dust house-dust-3"/>
+                    </g>
+                  </g>
+                )}
             </g>
 
 

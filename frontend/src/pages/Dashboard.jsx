@@ -9,19 +9,15 @@ import ThemeToggle from '../components/ThemeToggle';
 function HouseScene({ solved, total }) {
   const canvasRef = useRef(null);
   const animRef = useRef(null);
-  // const effectiveTotal = total || 8;
-  // const pct = Math.min(solved / effectiveTotal, 1);
-  // const s = Math.floor(pct * 8);
-
   const effectiveTotal = Math.max(total, 1);
   const progress = Math.min(solved / effectiveTotal, 1);
 
   // Continuous progress (0 → 1)
   const ground = Math.min(progress / 0.10, 1);
-  const foundation = Math.max(0, Math.min((progress - 0.10) / 0.10, 1));
-  const walls = Math.max(0, Math.min((progress - 0.20) / 0.20, 1));
-  const roof = Math.max(0, Math.min((progress - 0.40) / 0.20, 1));
-  const details = Math.max(0, Math.min((progress - 0.60) / 0.20, 1));
+  const foundation = Math.max(0, Math.min((progress - 0.10) / 0.15, 1));
+  const walls = Math.max(0, Math.min((progress - 0.25) / 0.35, 1));
+  const roof = Math.max(0, Math.min((progress - 0.60) / 0.20, 1));
+  const details = Math.max(0, Math.min((progress - 0.80) / 0.20, 1));
   const world = Math.max(0, Math.min((progress - 0.80) / 0.20, 1));
 
   // Keep the existing day/night logic
@@ -566,17 +562,6 @@ function WorldMap({ groups, navigate }) {
                           onClick={() => group.is_unlocked && navigate(`/challenge/${c.id}`)}
                           disabled={!group.is_unlocked}
                         >
-                          {/* {c.is_solved ? (
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                          ) : !group.is_unlocked ? (
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                            </svg>
-                          ) : (
-                            <span className="node-number">{ci + 1}</span>
-                          )} */}
 
                           {!group.is_unlocked ? (
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

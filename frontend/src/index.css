@@ -581,7 +581,7 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg-base); color: v
 /* ── Body: two-column ── */
 .chal-body {
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 460px 1fr;
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -1089,7 +1089,7 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg-base); color: v
 .chal-ai-messages::-webkit-scrollbar-track { background: transparent; }
 .chal-briefing::-webkit-scrollbar-thumb,
 .chal-arena::-webkit-scrollbar-thumb,
-.chal-ai-messages::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; } 
+.chal-ai-messages::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; } 
 
 /* Challenge page: blue accent override */
 .chal-btn-submit {
@@ -1208,6 +1208,75 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg-base); color: v
 .chal-robot-speech--success { color: #34d399; }
 .chal-robot-speech--idle { color: #64748b; }
 
+.chal-mascot-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+.chal-mascot-toggle {
+  padding: 0.3rem 0.7rem;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-mid);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: inherit;
+  line-height: 1.4;
+  transition: background 0.15s;
+}
+.chal-mascot-toggle:hover { background: var(--border-mid); }
+.chal-mascot-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  align-self: flex-end;
+}
+.chal-mascot-eye {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-mid);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.chal-mascot-eye:hover { background: var(--border-mid); color: var(--text-primary); }
+
+.snake-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 240px;
+  padding: 0.5rem 0;
+}
+.snake-caption {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  font-style: italic;
+  margin-top: 0.25rem;
+  text-align: center;
+}
+.snake-canvas {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+}
+.snake-score {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: monospace;
+  letter-spacing: 0.05em;
+}
 
 /* Admin table */
 .admin-table {
