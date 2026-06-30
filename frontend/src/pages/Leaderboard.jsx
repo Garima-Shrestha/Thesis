@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import useStore from '../store/useStore';
 import ThemeToggle from '../components/ThemeToggle';
+import Logo from '../components/Logo';
 
 export default function Leaderboard() {
   const [users, setUsers] = useState([]);
@@ -28,6 +29,9 @@ export default function Leaderboard() {
 
   return (
     <div className="lb-shell">
+      <div className="pq-logo-fixed">
+        <Logo size="sm" />
+      </div>
       <div style={{position:'fixed', top:'1rem', right:'1rem', zIndex:10, width:'120px'}}>
         <ThemeToggle />
       </div>

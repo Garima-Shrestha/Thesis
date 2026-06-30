@@ -4,6 +4,7 @@ import api from '../api/axios';
 import useStore from '../store/useStore';
 import chestImg from '../assets/chest.png';
 import ThemeToggle from '../components/ThemeToggle';
+import Logo from '../components/Logo';
 
 
 function HouseScene({ solved, total }) {
@@ -657,6 +658,7 @@ export default function Dashboard() {
       {levelUp && <LevelUpBanner level={levelUp} onDone={() => setLevelUp(null)} />}
 
       <div className="game-sidebar">
+        <Logo />
         {profile && (
           <>
             <div className="player-card">

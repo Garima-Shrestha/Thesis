@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import ThemeToggle from '../components/ThemeToggle';
+import Logo from '../components/Logo';
 
 const RANK_TITLES = [
   { min: 0,    title: 'Newcomer',        color: '#94a3b8' },
@@ -202,6 +203,9 @@ export default function Profile() {
 
   return (
     <div className="gprofile-shell">
+      <div className="pq-logo-fixed">
+        <Logo size="sm" />
+      </div>
       <div style={{position:'fixed', top:'1rem', right:'1rem', zIndex:10, width:'120px'}}>
         <ThemeToggle />
       </div>

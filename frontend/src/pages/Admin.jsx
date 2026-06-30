@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import useStore from '../store/useStore';
+import Logo from '../components/Logo';
 
 export default function Admin() {
   const [challenges, setChallenges] = useState([]);
@@ -140,6 +141,9 @@ export default function Admin() {
 
   return (
     <div className="admin-page">
+        <div className="pq-logo-fixed">
+        <Logo size="sm" linkTo={null} />
+      </div>
       <div className="admin-header" style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.5rem'}}>
           <h2>Admin Panel</h2>
           <div style={{display:'flex', gap:'0.75rem'}}>
