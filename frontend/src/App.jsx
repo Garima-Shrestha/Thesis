@@ -7,6 +7,7 @@ import Profile from './pages/Profile';
 import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
 import { useEffect } from 'react';
+import Landing from './pages/Landing';
 
 function PublicRoute({ children }) {
   const token = localStorage.getItem('token');
@@ -38,7 +39,7 @@ export default function App() {
     <BrowserRouter>
       <ThemeLoader />
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
