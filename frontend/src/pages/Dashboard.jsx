@@ -519,13 +519,35 @@ function LevelUpBanner({ level, onDone }) {
 
 
 function WorldMap({ groups, navigate }) {
+  const [expanded, setExpanded] = useState(() => new Set());
+
+  const toggleExpand = (id) => {
+    setExpanded(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  // Last unlocked group's index — the 2 groups right after it stay open too
+  const lastUnlockedIdx = groups.reduce((acc, g, i) => g.is_unlocked ? i : acc, -1);
+
   return (
     <div className="worldmap">
       {groups.map((group, gi) => {
         const allSolved = group.challenges.every(c => c.is_solved);
+        const withinPreviewRange = gi > lastUnlockedIdx && gi <= lastUnlockedIdx + 2;
+        const isExpanded = group.is_unlocked || withinPreviewRange || expanded.has(group.id);
         return (
-          <div key={group.id} className={`zone ${!group.is_unlocked ? 'zone-is-locked' : ''}`}>
-            <div className="zone-header">
+          <div
+            key={group.id}
+            className={`zone ${!group.is_unlocked ? 'zone-is-locked' : ''} ${!isExpanded ? 'zone-collapsed' : ''}`}
+          >
+            <div
+              className="zone-header"
+              style={!group.is_unlocked ? { cursor: 'pointer' } : undefined}
+              onClick={() => !group.is_unlocked && toggleExpand(group.id)}
+            >
               <div className="zone-header-left">
                 <span className="zone-tag">Zone {gi + 1}</span>
                 <span className="zone-name">{group.name}</span>
@@ -546,6 +568,7 @@ function WorldMap({ groups, navigate }) {
               </div>
             </div>
 
+            {isExpanded && (
             <div className="zone-track">
               {group.challenges.map((c, ci) => {
                 const isEvenRow = ci % 6 < 3;
@@ -598,6 +621,11 @@ function WorldMap({ groups, navigate }) {
                 );
               })}
             </div>
+            )}
+
+            {!group.is_unlocked && !isExpanded && (
+              <p className="zone-peek-hint">Tap to peek at this zone</p>
+            )}
 
             {gi < groups.length - 1 && (
               <div className="zone-bridge">
@@ -700,7 +728,24 @@ export default function Dashboard() {
       </div>
 
       <div className="game-main">
-        {profile && <HouseScene solved={profile.problems_solved} total={groups.reduce((acc, g) => acc + g.challenges.length, 0)} />}
+        {profile && (() => {
+          const CYCLE_SIZE = 2;
+          const currentGroupIdx = groups.findIndex(g => g.is_unlocked && !g.challenges.every(c => c.is_solved));
+          const activeIdx = currentGroupIdx === -1 ? groups.length - 1 : currentGroupIdx;
+          let cycleStart = Math.floor(activeIdx / CYCLE_SIZE) * CYCLE_SIZE;
+          let cycleGroups = groups.slice(cycleStart, cycleStart + CYCLE_SIZE);
+          let cycleSolved = cycleGroups.reduce((acc, g) => acc + g.challenges.filter(c => c.is_solved).length, 0);
+
+          // Keep showing the finished house until the first solve lands in the new cycle
+          if (cycleSolved === 0 && cycleStart > 0) {
+            cycleStart -= CYCLE_SIZE;
+            cycleGroups = groups.slice(cycleStart, cycleStart + CYCLE_SIZE);
+            cycleSolved = cycleGroups.reduce((acc, g) => acc + g.challenges.filter(c => c.is_solved).length, 0);
+          }
+
+          const cycleTotal = cycleGroups.reduce((acc, g) => acc + g.challenges.length, 0);
+          return <HouseScene solved={cycleSolved} total={cycleTotal} />;
+        })()}
         <h2 className="map-title">Challenge Map</h2>
         <WorldMap groups={groups} navigate={navigate} />
       </div>

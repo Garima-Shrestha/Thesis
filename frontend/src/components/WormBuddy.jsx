@@ -39,7 +39,7 @@ function randPos() {
   };
 }
 
-function SnakeBuddy({ state }) {
+function WormBuddy({ state }) {
   const [, forceRender] = useState(0);
   const [flash, setFlash] = useState(null);
 
@@ -245,4 +245,4 @@ function SnakeBuddy({ state }) {
   );
 }
 
-export default SnakeBuddy;
+export default WormBuddy;

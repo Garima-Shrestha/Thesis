@@ -84,18 +84,40 @@ router.get('/:id', authMiddleware, (req, res) => {
     WHERE user_id = ? AND challenge_id = ? AND status = 'accepted'
   `).get(userId, req.params.id);
 
+  // const totalSolvedCount = db.prepare(`
+  //   SELECT COUNT(DISTINCT challenge_id) as count
+  //   FROM submissions
+  //   WHERE user_id = ?
+  //   AND status = 'accepted'
+  // `).get(userId).count;
+
+  // const totalQuestionCount = db.prepare(`
+  //   SELECT COUNT(*) as count
+  //   FROM challenges
+  //   WHERE is_published = 1
+  // `).get().count;
+
+  const CYCLE_SIZE = 2;
+  const groupOrder = db.prepare('SELECT order_index FROM challenge_groups WHERE id = ?').get(challenge.group_id)?.order_index || 1;
+  const cycleStart = Math.floor((groupOrder - 1) / CYCLE_SIZE) * CYCLE_SIZE + 1;
+  const cycleEnd = cycleStart + CYCLE_SIZE - 1;
+
   const totalSolvedCount = db.prepare(`
-    SELECT COUNT(DISTINCT challenge_id) as count
-    FROM submissions
-    WHERE user_id = ?
-    AND status = 'accepted'
-  `).get(userId).count;
+    SELECT COUNT(DISTINCT s.challenge_id) as count
+    FROM submissions s
+    JOIN challenges c ON c.id = s.challenge_id
+    JOIN challenge_groups g ON g.id = c.group_id
+    WHERE s.user_id = ? AND s.status = 'accepted'
+    AND g.order_index BETWEEN ? AND ?
+  `).get(userId, cycleStart, cycleEnd).count;
 
   const totalQuestionCount = db.prepare(`
     SELECT COUNT(*) as count
-    FROM challenges
-    WHERE is_published = 1
-  `).get().count;
+    FROM challenges c
+    JOIN challenge_groups g ON g.id = c.group_id
+    WHERE c.is_published = 1
+    AND g.order_index BETWEEN ? AND ?
+  `).get(cycleStart, cycleEnd).count || 1;
 
   res.json({ ...challenge, sample_test_cases: testCases, attempt_count: attemptCount, is_solved: !!isSolved, total_solved_count: totalSolvedCount, total_question_count: totalQuestionCount });
 });

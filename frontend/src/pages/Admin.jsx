@@ -17,6 +17,8 @@ export default function Admin() {
   });
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('success');
+  const [challengePage, setChallengePage] = useState(1);
+  const CHALLENGES_PER_PAGE = 10;
   const { user, logout } = useStore();
   const navigate = useNavigate();
 
@@ -26,6 +28,7 @@ export default function Admin() {
   }, []);
 
   const fetchData = async () => {
+    setChallengePage(1);
     const [cRes, uRes, gRes] = await Promise.all([
       api.get('/admin/challenges'),
       api.get('/admin/users'),
@@ -182,7 +185,7 @@ export default function Admin() {
             {challenges.length === 0 && (
               <tr><td colSpan="5" style={{color:'#94a3b8', textAlign:'center'}}>No challenges yet. Create one.</td></tr>
             )}
-            {challenges.map(c => (
+            {challenges.slice((challengePage - 1) * CHALLENGES_PER_PAGE, challengePage * CHALLENGES_PER_PAGE).map(c => (
               <tr key={c.id}>
                 <td>{c.title}</td>
                 <td><span className={`difficulty ${c.difficulty}`}>{c.difficulty}</span></td>
@@ -199,6 +202,29 @@ export default function Admin() {
             ))}
           </tbody>
         </table>
+        {challenges.length > CHALLENGES_PER_PAGE && (
+          <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'1rem', marginTop:'1rem'}}>
+            <button
+              className="admin-header-btn"
+              onClick={() => setChallengePage(p => Math.max(1, p - 1))}
+              disabled={challengePage === 1}
+              style={{opacity: challengePage === 1 ? 0.5 : 1}}
+            >
+              ← Previous
+            </button>
+            <span style={{fontSize:'0.85rem', color:'var(--text-secondary)'}}>
+              Page {challengePage} of {Math.ceil(challenges.length / CHALLENGES_PER_PAGE)}
+            </span>
+            <button
+              className="admin-header-btn"
+              onClick={() => setChallengePage(p => Math.min(Math.ceil(challenges.length / CHALLENGES_PER_PAGE), p + 1))}
+              disabled={challengePage >= Math.ceil(challenges.length / CHALLENGES_PER_PAGE)}
+              style={{opacity: challengePage >= Math.ceil(challenges.length / CHALLENGES_PER_PAGE) ? 0.5 : 1}}
+            >
+              Next →
+            </button>
+          </div>
+        )}
         </div>
       )}
 

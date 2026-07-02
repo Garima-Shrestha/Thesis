@@ -5,7 +5,8 @@ import api from '../api/axios';
 import ReactMarkdown from 'react-markdown';
 import useStore from '../store/useStore';
 import StudyBuddy from '../components/StudyBuddy';
-import SnakeBuddy from '../components/SnakeBuddy';
+import WormBuddy from '../components/WormBuddy';
+import SnakeLadderBuddy from '../components/SnakeLadderBuddy';
 import ThemeToggle from '../components/ThemeToggle';
 
 const DEFAULT_CODE = `# Write your solution here\n`;
@@ -65,10 +66,15 @@ export default function Challenge() {
   const [mascotView, setMascotView] = useState(() => localStorage.getItem('mascotView') || 'house');
   const [mascotHidden, setMascotHidden] = useState(() => localStorage.getItem('mascotHidden') === 'true');
   const typingTimer = useRef(null);
+  const prevCodeLenRef = useRef(code.length);
 
-  const toggleMascot = () => {
+  const MASCOT_VIEWS = ['house', 'worm', 'ladder'];
+  const MASCOT_LABELS = { house: 'House', worm: 'Worm', ladder: 'Snake & Ladder' };
+
+  const cycleMascot = () => {
     setMascotView(prev => {
-      const next = prev === 'house' ? 'snake' : 'house';
+      const idx = MASCOT_VIEWS.indexOf(prev);
+      const next = MASCOT_VIEWS[(idx + 1) % MASCOT_VIEWS.length];
       localStorage.setItem('mascotView', next);
       return next;
     });
@@ -180,11 +186,9 @@ export default function Challenge() {
 
       if (res.data.status === 'accepted') {
         const challengeRes = await api.get(`/challenges/${id}`);
+        setChallenge(challengeRes.data);
         setTotalSolvedCount(challengeRes.data.total_solved_count || 0);
         setTotalQuestionCount(challengeRes.data.total_question_count || 1);
-        // Reset typing progress: solved question now covers this permanently
-        setTypingProgress(0);
-        localStorage.setItem(typingStorageKey, '0');
       }
 
       setTimeout(() => setRobotState('idle'), 3000);
@@ -267,8 +271,8 @@ export default function Challenge() {
 
           <div className="chal-mascot-area">
             <div className="chal-mascot-controls">
-              <button className="chal-mascot-toggle" onClick={toggleMascot} type="button">
-                {mascotView === 'house' ? 'Switch to Snake' : 'Switch to House'}
+              <button className="chal-mascot-toggle" onClick={cycleMascot} type="button">
+                Switch to {MASCOT_LABELS[MASCOT_VIEWS[(MASCOT_VIEWS.indexOf(mascotView) + 1) % MASCOT_VIEWS.length]]}
               </button>
               <button
                 className="chal-mascot-eye"
@@ -292,8 +296,11 @@ export default function Challenge() {
             <div style={{ display: !mascotHidden && mascotView === 'house' ? 'block' : 'none' }}>
               <StudyBuddy key={id} state={robotState} progress={houseProgress} />
             </div>
-            <div style={{ display: !mascotHidden && mascotView === 'snake' ? 'block' : 'none' }}>
-              <SnakeBuddy key={id} state={robotState} progress={snakeProgress} />
+            <div style={{ display: !mascotHidden && mascotView === 'worm' ? 'block' : 'none' }}>
+              <WormBuddy key={id} state={robotState} progress={snakeProgress} />
+            </div>
+            <div style={{ display: !mascotHidden && mascotView === 'ladder' ? 'block' : 'none' }}>
+              <SnakeLadderBuddy key={id} state={robotState} codeLength={code.length} />
             </div>
           </div>
           <div style={{ height: '1px', background: 'var(--border-strong)', margin: '0.25rem 0 0.5rem' }} />
@@ -373,24 +380,27 @@ export default function Challenge() {
                 const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id || 'guest';
                 localStorage.setItem(`code_${userId}_challenge_${id}`, val);
 
-                // Builder starts building
-                setRobotState('building');
+                const codeLength = (val || '').length;
+                clearTimeout(typingTimer.current);
+
+                if (codeLength > prevCodeLenRef.current) {
+                  // Only real typing (growth) counts as "building"
+                  setRobotState('building');
+                  typingTimer.current = setTimeout(() => {
+                    setRobotState('thinking');
+                  }, 2000);
+                } else {
+                  // Backspace / deletion: stop the dice immediately, wait for real typing
+                  setRobotState('thinking');
+                }
+                prevCodeLenRef.current = codeLength;
 
                 // Progress based on code length, not keystrokes
                 // So deleting reduces it, typing increases it
-                const codeLength = (val || '').length;
                 const newTypingProgress = Math.min((codeLength / 400) * MAX_TYPING_BOOST, MAX_TYPING_BOOST);
 
                 setTypingProgress(newTypingProgress);
                 localStorage.setItem(typingStorageKey, String(newTypingProgress));
-
-                // Stop previous timer
-                clearTimeout(typingTimer.current);
-
-                // After 2 seconds without typing -> thinking
-                typingTimer.current = setTimeout(() => {
-                  setRobotState('thinking');
-                }, 2000);
               }}
               theme="vs-dark"
               options={{

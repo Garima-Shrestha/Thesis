@@ -10,7 +10,7 @@ const STEPS = [
 
 const FEATURES = [
   { icon: '🏠', title: 'Build Your Home', text: 'Watch your house grow brick by brick as you solve more challenges.' },
-  { icon: '🐍', title: 'SnakeBuddy Mode', text: 'Prefer a different vibe? Switch to a snake companion that hunts for food as you type.' },
+  { icon: '🐍', title: 'WormBuddy Mode', text: 'Prefer a different vibe? Switch to a worm companion that hunts for food as you type.' },
   { icon: '🔥', title: 'Streaks & Badges', text: 'Keep your daily streak alive and unlock badges for consistency and skill.' },
   { icon: '🤖', title: 'AI Tutor', text: 'Stuck? Ask the built-in AI tutor for hints, not full answers, right inside the challenge.' },
   { icon: '🏆', title: 'Leaderboard', text: 'Compete with classmates on weekly XP and climb the ranks.' },
