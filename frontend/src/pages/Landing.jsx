@@ -8,13 +8,43 @@ const STEPS = [
   { num: '03', title: 'Earn XP & Level Up', text: 'Pass all test cases to earn XP, grow your home, build streaks, and unlock badges.' },
 ];
 
+const FeatureIcon = ({ path }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    {path}
+  </svg>
+);
+
 const FEATURES = [
-  { icon: '🏠', title: 'Build Your Home', text: 'Watch your house grow brick by brick as you solve more challenges.' },
-  { icon: '🐍', title: 'WormBuddy Mode', text: 'Prefer a different vibe? Switch to a worm companion that hunts for food as you type.' },
-  { icon: '🔥', title: 'Streaks & Badges', text: 'Keep your daily streak alive and unlock badges for consistency and skill.' },
-  { icon: '🤖', title: 'AI Tutor', text: 'Stuck? Ask the built-in AI tutor for hints, not full answers, right inside the challenge.' },
-  { icon: '🏆', title: 'Leaderboard', text: 'Compete with classmates on weekly XP and climb the ranks.' },
-  { icon: '🎨', title: '3 Themes', text: 'Code in dark, light, or warm wood/parchment mode, whichever helps you focus.' },
+  {
+    icon: <FeatureIcon path={<><path d="M3 11l9-7 9 7" /><path d="M5 10v10h14V10" /><path d="M10 20v-6h4v6" /></>} />,
+    title: 'Build Your Home',
+    text: 'Watch your house grow brick by brick as you solve more challenges.',
+  },
+  {
+    icon: <FeatureIcon path={<><circle cx="12" cy="8" r="5" /><path d="M8 21l2-5h4l2 5" /><path d="M9 8h.01M15 8h.01" /></>} />,
+    title: 'Pick Your Companion',
+    text: 'Follow along with a house builder or a worm hunting for food, and switch anytime to a Snake & Ladder board that tracks your progress tile by tile.',
+  },
+  {
+    icon: <FeatureIcon path={<><path d="M12 2c2 3 3 5 3 7a3 3 0 0 1-6 0c0-2 1-4 3-7z" /><path d="M6 14c1 3 3 5 6 5s5-2 6-5" /></>} />,
+    title: 'Streaks & Badges',
+    text: 'Keep your daily streak alive and unlock badges for consistency and skill.',
+  },
+  {
+    icon: <FeatureIcon path={<><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></>} />,
+    title: 'AI Tutor',
+    text: 'Stuck? Ask the built-in AI tutor for hints, not full answers, right inside the challenge.',
+  },
+  {
+    icon: <FeatureIcon path={<><path d="M8 21h8" /><path d="M12 17v4" /><path d="M7 4h10v5a5 5 0 0 1-10 0V4z" /><path d="M7 6H4a2 2 0 0 0 2 4M17 6h3a2 2 0 0 1-2 4" /></>} />,
+    title: 'Leaderboard',
+    text: 'Compete with classmates on weekly XP and climb the ranks.',
+  },
+  {
+    icon: <FeatureIcon path={<><circle cx="12" cy="12" r="9" /><circle cx="9" cy="10" r="1" fill="currentColor" /><circle cx="14" cy="9" r="1" fill="currentColor" /><circle cx="15" cy="14" r="1" fill="currentColor" /><path d="M12 21a2 2 0 0 1-2-2c0-1 1-1 1-2a1.5 1.5 0 0 0-1.5-1.5H8a3 3 0 0 1-3-3 9 9 0 1 1 9 9.5" /></>} />,
+    title: '3 Themes',
+    text: 'Code in dark, light, or warm wood/parchment mode, whichever helps you focus.',
+  },
 ];
 
 export default function Landing() {
@@ -144,7 +174,7 @@ export default function Landing() {
         <button className="land-cta-primary" onClick={() => navigate('/register')}>
           <span className="land-cta-bracket">[</span> Create Character <span className="land-cta-bracket">]</span>
         </button>
-        <p className="land-footer-meta">PyQuest — a thesis project built to make learning to code feel like playing one.</p>
+        <p className="land-footer-meta">PyQuest built to make learning to code feel like playing one.</p>
       </section>
     </div>
   );

@@ -1783,6 +1783,9 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg-base); color: v
   position: relative; z-index: 2;
   display: flex; align-items: center; justify-content: space-between;
   padding: 1.25rem 2rem;
+  background: color-mix(in srgb, var(--bg-base) 96%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
 }
 .land-topbar-actions { display: flex; align-items: center; gap: 0.75rem; }
 
@@ -1807,12 +1810,13 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg-base); color: v
   border-color: var(--accent-light);
   transform: translateY(-1px);
 }
-
-/* Topbar polish */
-.land-topbar {
-  background: rgba(15, 23, 42, 0.96);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+[data-theme="light"] .land-login-btn {
+  border-color: var(--border-strong);
+  color: var(--accent);
+}
+[data-theme="light"] .land-login-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
 }
 
 /* Hero */
@@ -1913,7 +1917,7 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg-base); color: v
   transition: transform 0.15s, border-color 0.15s;
 }
 .land-feature-card:hover { transform: translateY(-2px); border-color: var(--accent); }
-.land-feature-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+.land-feature-icon { color: var(--accent); margin-bottom: 0.5rem; }
 .land-feature-title { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem; }
 .land-feature-text { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
 

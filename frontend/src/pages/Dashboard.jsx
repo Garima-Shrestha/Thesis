@@ -287,12 +287,10 @@ function HouseScene({ solved, total }) {
         ctx.fillStyle = '#14532d';
         ctx.beginPath(); ctx.ellipse(148, 256, 42, 18, 0, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = bushGreen;
-        // ctx.beginPath(); ctx.ellipse(158, 248, 32, 18, 0, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath();
         ctx.ellipse( 158, 248 + (1 - plantScale) * 14, 32 * plantScale, 18 * plantScale, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = '#166534';
-        // ctx.beginPath(); ctx.ellipse(138, 250, 26, 15, 0, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath();
         ctx.ellipse( 138, 250 + (1 - plantScale) * 12, 26 * plantScale, 15 * plantScale, 0, 0, Math.PI * 2);
         ctx.fill();
