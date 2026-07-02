@@ -5,6 +5,31 @@ import { writeFile, mkdir } from 'fs/promises';
 import os from 'os';
 import pathModule from 'path';
 
+
+// ── Security: block dangerous Python patterns before execution ──
+// This is NOT a full sandbox — it's a basic defense-in-depth check
+// to stop the most obvious escape attempts (file access, shelling out,
+// dynamic imports/eval). Real isolation would need Docker/Judge0.
+const BLOCKED_PATTERNS = [
+  /\bimport\s+os\b/,
+  /\bimport\s+subprocess\b/,
+  /\bimport\s+socket\b/,
+  /\bimport\s+sys\b/,
+  /\bimport\s+shutil\b/,
+  /\bimport\s+ctypes\b/,
+  /\bimport\s+multiprocessing\b/,
+  /\b__import__\s*\(/,
+  /\bopen\s*\(/,
+  /\bexec\s*\(/,
+  /\beval\s*\(/,
+];
+
+// Checks submitted code against the blocklist above.
+// Returns true if the code contains anything disallowed.
+function containsBlockedCode(code) {
+  return BLOCKED_PATTERNS.some(pattern => pattern.test(code));
+}
+
 export const runCode = async (code, challengeId) => {
   const testCases = db.prepare(`
     SELECT * FROM test_cases WHERE challenge_id = ? AND is_sample = 1
@@ -56,8 +81,25 @@ export const submitCode = async (userId, challengeId, code) => {
 };
 
 
+// const executeAgainstCases = async (code, testCases) => {
+//   const results = [];
+//   const tmpDir = pathModule.join(os.tmpdir(), `gcp_${Date.now()}`);
+
+//   try {
 const executeAgainstCases = async (code, testCases) => {
   const results = [];
+
+  // ── Security check: reject code with blocked patterns before running it ──
+  if (containsBlockedCode(code)) {
+    // Return a "failed" result for every test case instead of executing anything
+    return testCases.map(tc => ({
+      passed: false,
+      expected: tc.expected_output,
+      actual: 'Code contains disallowed operations (file access, imports like os/sys/subprocess, or eval/exec).',
+      status: 'Blocked',
+    }));
+  }
+
   const tmpDir = pathModule.join(os.tmpdir(), `gcp_${Date.now()}`);
 
   try {
