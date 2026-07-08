@@ -300,7 +300,7 @@ export default function Challenge() {
               <WormBuddy key={id} state={robotState} progress={snakeProgress} />
             </div>
             <div style={{ display: !mascotHidden && mascotView === 'ladder' ? 'block' : 'none' }}>
-              <SnakeLadderBuddy key={id} state={robotState} codeLength={code.length} />
+              <SnakeLadderBuddy key={id} state={robotState} codeLength={code.length} difficulty={challenge.difficulty} attemptCount={attemptCount} isVisible={!mascotHidden && mascotView === 'ladder'} />
             </div>
           </div>
           <div style={{ height: '1px', background: 'var(--border-strong)', margin: '0.25rem 0 0.5rem' }} />
