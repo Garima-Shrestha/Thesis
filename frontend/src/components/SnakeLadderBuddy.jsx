@@ -344,6 +344,7 @@ useEffect(() => {
         setFlash('win');
         setMessage('Solved it! You reached the top!');
         setTimeout(() => setFlash(null), 4000);
+        if (isVisible && soundOn) playLadderSound();
       } else {
         setMessage('Great job: a ladder appears!');
         triggerSlide('ladder', getLadderTarget());
