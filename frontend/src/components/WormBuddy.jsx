@@ -223,7 +223,7 @@ function DragonCharacter({ cx, cy, facingRight, scale, isFire, isEpic, isTransfo
             </>
           )}
 
-          {/* Fire breath — bigger burst during the victory head-bob */}
+          {/* Fire breath: bigger burst during the victory head-bob */}
           {mouthOpen && (
             <g className="snake-fire">
               <circle cx="38" cy="4" r={wiggle ? 4.2 : 2.6} fill="#f97316" />
@@ -296,7 +296,7 @@ function WormBuddy({ state, isVisible = true }) {
       const ctx = getAudioCtx();
       const now = ctx.currentTime;
 
-      // 1. Rising "power-up" sweep — bright square wave gliding up, like charging up energy
+      // 1. Rising "power-up" sweep bright square wave gliding up, like charging up energy
       const sweep = ctx.createOscillator();
       sweep.type = 'square';
       sweep.frequency.setValueAtTime(220, now);
@@ -313,11 +313,11 @@ function WormBuddy({ state, isVisible = true }) {
       sweep.start(now);
       sweep.stop(now + 0.4);
 
-      // 2. Triumphant chord stabs — two quick punchy major chords, like a heroic "ta-DA!"
+      // 2. Triumphant chord stabs two quick punchy major chords, like a heroic "ta-DA!"
       const chordTimes = [now + 0.32, now + 0.55];
       const chordFreqSets = [
         [392.0, 493.88, 587.33],   // G4 B4 D5
-        [523.25, 659.25, 783.99],  // C5 E5 G5 — resolves up, feels like a win
+        [523.25, 659.25, 783.99],  // C5 E5 G5 resolves up, feels like a win
       ];
       chordFreqSets.forEach((freqs, ci) => {
         const t = chordTimes[ci];
@@ -371,7 +371,7 @@ function WormBuddy({ state, isVisible = true }) {
         noise.stop(t + 0.08);
       });
 
-      // 4. Sparkle shimmer trailing off after the final chord — celebratory glitter
+      // 4. Sparkle shimmer trailing off after the final chord celebratory glitter
       const sparkleStart = now + 0.65;
       for (let i = 0; i < 5; i++) {
         const t = sparkleStart + Math.random() * 0.35;
@@ -386,7 +386,7 @@ function WormBuddy({ state, isVisible = true }) {
         osc.start(t);
         osc.stop(t + 0.25);
       }
-    } catch (e) { /* audio not supported / blocked — fail silently */ }
+    } catch (e) { /* audio not supported / blocked fail silently */ }
   };
 
   useEffect(() => {
@@ -480,7 +480,7 @@ function WormBuddy({ state, isVisible = true }) {
     return () => clearInterval(iv);
   }, []);
 
-  // Periodic fire breathing — only puffs every few seconds instead of constantly
+  // Periodic fire breathing only puffs every few seconds instead of constantly
   useEffect(() => {
     const iv = setInterval(() => {
       const stageNow = stageFromLength(lengthRef.current);
@@ -496,7 +496,7 @@ function WormBuddy({ state, isVisible = true }) {
     if (state === prevState.current) return;
     prevState.current = state;
 
-    // Run failures only show a sad reaction — no stage regression.
+    // Run failures only show a sad reaction no stage regression.
     if (state === 'run_error') {
       setFlash('run_error');
       setTimeout(() => setFlash(null), 700);

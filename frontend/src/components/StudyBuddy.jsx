@@ -21,13 +21,13 @@ function StudyBuddy({ state, progress, isVisible = true }) {
     return audioCtxRef.current;
   };
 
-// Celebration fanfare: ascending bell-like arpeggio + sparkle (~1s)
+// Celebration fanfare: ascending bell-like arpeggio and sparkle (~1s)
   const playCheerSound = () => {
     try {
       const ctx = getAudioCtx();
       const now = ctx.currentTime;
 
-      // Major arpeggio notes (C, E, G, C octave) — classic "success" progression
+      // Major arpeggio notes (C, E, G, C octave) classic "success" progression
       const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
       const noteSpacing = 0.09;
 
@@ -35,7 +35,7 @@ function StudyBuddy({ state, progress, isVisible = true }) {
         const startTime = now + i * noteSpacing;
         const isLast = i === notes.length - 1;
 
-        // Bell tone: sine fundamental + quiet higher partials for a chime-like timbre
+        // Bell tone: sine fundamental and quiet higher partials for a chime-like timbre
         const fundamental = ctx.createOscillator();
         fundamental.type = 'sine';
         fundamental.frequency.value = freq;
@@ -107,7 +107,7 @@ function StudyBuddy({ state, progress, isVisible = true }) {
       noise.connect(noiseFilter).connect(noiseGain).connect(ctx.destination);
       noise.start(now);
       noise.stop(now + 0.5);
-    } catch (e) { /* audio not supported / blocked — fail silently */ }
+    } catch (e) { /* audio not supported / blocked fail silently */ }
   };
 
   const isIdle = state === 'idle';
