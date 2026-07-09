@@ -143,6 +143,21 @@ router.get('/:id/solution', authMiddleware, (req, res) => {
     });
   }
 
+  // Mark that this user viewed the solution BEFORE solving it
+  // this is what strips XP later when they do solve it.
+  if (!alreadySolved) {
+    const alreadyMarked = db.prepare(`
+      SELECT id FROM solution_views WHERE user_id = ? AND challenge_id = ?
+    `).get(userId, req.params.id);
+
+    if (!alreadyMarked) {
+      db.prepare(`
+        INSERT INTO solution_views (user_id, challenge_id, viewed_at)
+        VALUES (?, ?, ?)
+      `).run(userId, req.params.id, new Date().toISOString());
+    }
+  }
+
   const testCases = db.prepare(`
     SELECT input, expected_output FROM test_cases
     WHERE challenge_id = ? AND is_sample = 1

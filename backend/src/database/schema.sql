@@ -95,3 +95,12 @@ CREATE TABLE IF NOT EXISTS user_group_progress (
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (group_id) REFERENCES challenge_groups(id)
 );
+
+CREATE TABLE IF NOT EXISTS solution_views (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  challenge_id INTEGER NOT NULL,
+  viewed_at TEXT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (challenge_id) REFERENCES challenges(id)
+);

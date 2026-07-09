@@ -6,8 +6,8 @@ import os from 'os';
 import pathModule from 'path';
 
 
-// ── Security: block dangerous Python patterns before execution ──
-// This is NOT a full sandbox — it's a basic defense-in-depth check
+// Security: block dangerous Python patterns before execution 
+// This is NOT a full sandbox: it's a basic defense-in-depth check
 // to stop the most obvious escape attempts (file access, shelling out,
 // dynamic imports/eval). Real isolation would need Docker/Judge0.
 const BLOCKED_PATTERNS = [
@@ -65,8 +65,17 @@ export const submitCode = async (userId, challengeId, code) => {
 
 
     if (alreadySolved.length === 1) {
-      const challenge = db.prepare('SELECT xp_reward FROM challenges WHERE id = ?').get(challengeId);
-      awardXP(userId, challenge.xp_reward, 'challenge_solved', challengeId);
+      const viewedSolutionFirst = db.prepare(`
+        SELECT id FROM solution_views WHERE user_id = ? AND challenge_id = ?
+      `).get(userId, challengeId);
+
+      if (!viewedSolutionFirst) {
+        const challenge = db.prepare('SELECT xp_reward FROM challenges WHERE id = ?').get(challengeId);
+        awardXP(userId, challenge.xp_reward, 'challenge_solved', challengeId);
+      }
+      // If they viewed the solution first, they get 0 XP for this challenge —
+      // the earlier -5 deduction (if it happened) already applied, and that's it.
+
       updateStreak(userId);
       db.prepare(`
         UPDATE users SET problems_solved = problems_solved + 1 WHERE id = ?
@@ -75,7 +84,6 @@ export const submitCode = async (userId, challengeId, code) => {
       checkGroupUnlock(userId);
     }
   }
-
 
   return { status, results };
 };
