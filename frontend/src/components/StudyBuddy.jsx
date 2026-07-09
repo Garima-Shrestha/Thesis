@@ -1,7 +1,115 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 
-function StudyBuddy({ state, progress }) {
+function StudyBuddy({ state, progress, isVisible = true }) {
+  const [soundOn, setSoundOn] = React.useState(() => localStorage.getItem('houseCheerSoundOn') !== 'false');
+  const audioCtxRef = React.useRef(null);
+  const prevStateRef = React.useRef(state);
+
+  const toggleSound = () => {
+    setSoundOn(prev => {
+      const next = !prev;
+      localStorage.setItem('houseCheerSoundOn', String(next));
+      return next;
+    });
+  };
+
+  const getAudioCtx = () => {
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtxRef.current;
+  };
+
+// Celebration fanfare: ascending bell-like arpeggio + sparkle (~1s)
+  const playCheerSound = () => {
+    try {
+      const ctx = getAudioCtx();
+      const now = ctx.currentTime;
+
+      // Major arpeggio notes (C, E, G, C octave) — classic "success" progression
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      const noteSpacing = 0.09;
+
+      notes.forEach((freq, i) => {
+        const startTime = now + i * noteSpacing;
+        const isLast = i === notes.length - 1;
+
+        // Bell tone: sine fundamental + quiet higher partials for a chime-like timbre
+        const fundamental = ctx.createOscillator();
+        fundamental.type = 'sine';
+        fundamental.frequency.value = freq;
+
+        const partial2 = ctx.createOscillator();
+        partial2.type = 'sine';
+        partial2.frequency.value = freq * 2.01; // slightly detuned = bell shimmer
+        const partial2Gain = ctx.createGain();
+        partial2Gain.gain.value = 0.15;
+
+        const partial3 = ctx.createOscillator();
+        partial3.type = 'sine';
+        partial3.frequency.value = freq * 3.0;
+        const partial3Gain = ctx.createGain();
+        partial3Gain.gain.value = 0.08;
+
+        const noteGain = ctx.createGain();
+        const peak = isLast ? 0.35 : 0.25;
+        const noteDuration = isLast ? 0.6 : 0.35;
+        noteGain.gain.setValueAtTime(0, startTime);
+        noteGain.gain.linearRampToValueAtTime(peak, startTime + 0.01); // fast bell attack
+        noteGain.gain.exponentialRampToValueAtTime(0.001, startTime + noteDuration); // natural decay
+
+        fundamental.connect(noteGain);
+        partial2.connect(partial2Gain).connect(noteGain);
+        partial3.connect(partial3Gain).connect(noteGain);
+        noteGain.connect(ctx.destination);
+
+        fundamental.start(startTime);
+        fundamental.stop(startTime + noteDuration + 0.05);
+        partial2.start(startTime);
+        partial2.stop(startTime + noteDuration + 0.05);
+        partial3.start(startTime);
+        partial3.stop(startTime + noteDuration + 0.05);
+      });
+
+      // Sparkle/shimmer burst on the final note for extra celebratory sheen
+      const sparkleStart = now + notes.length * noteSpacing;
+      for (let i = 0; i < 6; i++) {
+        const sparkleOsc = ctx.createOscillator();
+        sparkleOsc.type = 'sine';
+        const sparkleFreq = 1500 + Math.random() * 1500;
+        sparkleOsc.frequency.value = sparkleFreq;
+        const sparkleGain = ctx.createGain();
+        const sparkleTime = sparkleStart + Math.random() * 0.3;
+        sparkleGain.gain.setValueAtTime(0, sparkleTime);
+        sparkleGain.gain.linearRampToValueAtTime(0.06, sparkleTime + 0.01);
+        sparkleGain.gain.exponentialRampToValueAtTime(0.001, sparkleTime + 0.25);
+        sparkleOsc.connect(sparkleGain).connect(ctx.destination);
+        sparkleOsc.start(sparkleTime);
+        sparkleOsc.stop(sparkleTime + 0.3);
+      }
+
+      // Soft low "whoosh" underneath to give the fanfare some body
+      const bufferSize = ctx.sampleRate * 0.5;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const noiseFilter = ctx.createBiquadFilter();
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.value = 800;
+      noiseFilter.Q.value = 0.5;
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0, now);
+      noiseGain.gain.linearRampToValueAtTime(0.04, now + 0.05);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      noise.connect(noiseFilter).connect(noiseGain).connect(ctx.destination);
+      noise.start(now);
+      noise.stop(now + 0.5);
+    } catch (e) { /* audio not supported / blocked — fail silently */ }
+  };
+
   const isIdle = state === 'idle';
   const isThinking = state === 'thinking';
   const isSuccess = state === 'success';
@@ -42,6 +150,12 @@ function StudyBuddy({ state, progress }) {
 
 
   const wallProgress = reveal(0.25, 0.60);
+  React.useEffect(() => {
+    if (state === 'success' && prevStateRef.current !== 'success') {
+      if (isVisible && soundOn) playCheerSound();
+    }
+    prevStateRef.current = state;
+  }, [state]);
 
 
   const totalBricks = 40;
@@ -73,6 +187,7 @@ function StudyBuddy({ state, progress }) {
           height: '380px',
           minHeight: '380px',
           flexShrink: 0,
+          position: 'relative',
         }}
       >
       <style>{`
@@ -220,6 +335,26 @@ function StudyBuddy({ state, progress }) {
         }
       `}</style>
 
+      <button
+        type="button"
+        onClick={toggleSound}
+        title={soundOn ? 'Mute cheer sound' : 'Unmute cheer sound'}
+        style={{ position: 'absolute', background: 'none', border: 'none', cursor: 'pointer', padding: '0.25rem', display: 'flex', alignItems: 'center', color: 'var(--text-secondary)', zIndex: 1 }}
+      >
+        {soundOn ? (
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+          </svg>
+        ) : (
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <line x1="23" y1="9" x2="17" y2="15" />
+            <line x1="17" y1="9" x2="23" y2="15" />
+          </svg>
+        )}
+      </button>
       <svg
         width="100%"
         height="100%"
