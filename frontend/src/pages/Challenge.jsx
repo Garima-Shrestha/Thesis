@@ -294,10 +294,10 @@ export default function Challenge() {
               </button>
             </div>
             <div style={{ display: !mascotHidden && mascotView === 'house' ? 'block' : 'none' }}>
-              <StudyBuddy key={id} state={robotState} progress={houseProgress} />
+              <StudyBuddy key={id} state={robotState} progress={houseProgress} isVisible={!mascotHidden && mascotView === 'house'} />
             </div>
             <div style={{ display: !mascotHidden && mascotView === 'worm' ? 'block' : 'none' }}>
-              <WormBuddy key={id} state={robotState} progress={snakeProgress} />
+              <WormBuddy key={id} state={robotState} progress={snakeProgress} isVisible={!mascotHidden && mascotView === 'worm'} />
             </div>
             <div style={{ display: !mascotHidden && mascotView === 'ladder' ? 'block' : 'none' }}>
               <SnakeLadderBuddy key={id} state={robotState} codeLength={code.length} difficulty={challenge.difficulty} attemptCount={attemptCount} isVisible={!mascotHidden && mascotView === 'ladder'} />
